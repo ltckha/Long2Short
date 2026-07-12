@@ -1,0 +1,14 @@
+{
+  "input": "temp/smoke_drawtext_input.mp4",
+  "output": "temp/smoke_drawtext_final.mp4",
+  "scenes": [
+    {
+      "id": "special",
+      "start": 0,
+      "end": 1,
+      "subtitle": "It's 50%: ok, [x]; path\\name\nnext",
+      "text_effect": "fade",
+      "advanced_effect": "flash"
+    }
+  ]
+}

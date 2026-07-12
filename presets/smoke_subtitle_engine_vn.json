@@ -1,0 +1,57 @@
+{
+  "input": "temp/smoke_audio_input.mp4",
+  "output": "temp/smoke_subtitle_engine_vn_final.mp4",
+  "timeline": [
+    {
+      "scene_id": "top_hook",
+      "scene_type": "hook",
+      "start_s": 0,
+      "end_s": 0.35,
+      "duration_s": 0.35,
+      "subtitle": "Tiếng Việt: ă â ê ô ơ ư đ Á À Ả Ạ ấ ầ",
+      "subtitle_style": "hook_bold",
+      "text_position": "top",
+      "text_effect": {
+        "name": "Pop-up"
+      },
+      "advanced_effect": {
+        "name": "Flash"
+      },
+      "include": true
+    },
+    {
+      "scene_id": "center_neon",
+      "scene_type": "demo",
+      "start_s": 0.35,
+      "end_s": 0.75,
+      "duration_s": 0.4,
+      "subtitle": "Dòng chữ rất dài cần tự động xuống dòng, căn giữa thật đẹp và không bị mất chữ hai bên màn hình",
+      "subtitle_style": "neon_glow",
+      "text_position": "center",
+      "text_effect": {
+        "name": "Bounce"
+      },
+      "advanced_effect": {
+        "name": "Zoom In"
+      },
+      "include": true
+    },
+    {
+      "scene_id": "bottom_cta",
+      "scene_type": "cta",
+      "start_s": 0.75,
+      "end_s": 1.15,
+      "duration_s": 0.4,
+      "subtitle": "MUA NGAY HÔM NAY",
+      "subtitle_style": "cta_red",
+      "text_position": "bottom",
+      "text_effect": {
+        "name": "Slide In"
+      },
+      "advanced_effect": {
+        "name": "Shake"
+      },
+      "include": true
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "input": "temp/smoke_audio_input.mp4",
+  "output": "temp/smoke_semantic_effects_final.mp4",
+  "timeline": [
+    {
+      "scene_id": "semantic_reveal",
+      "start_s": 0,
+      "end_s": 0.35,
+      "duration_s": 0.35,
+      "subtitle": "Semantic reveal",
+      "text_effect": {
+        "name": "Pop-up"
+      },
+      "advanced_effect": {
+        "name": "Cinematic Reveal",
+        "intent": "reveal_impact",
+        "mood": "dramatic",
+        "pacing": "pulse",
+        "focus": "product",
+        "camera_motion": "overshoot",
+        "intensity": 0.82,
+        "description": "Reveal the product with a strong cinematic impact."
+      },
+      "include": true
+    },
+    {
+      "scene_id": "semantic_luxury",
+      "start_s": 0.35,
+      "end_s": 0.75,
+      "duration_s": 0.4,
+      "subtitle": "Luxury soft push",
+      "text_effect": {
+        "name": "Glow"
+      },
+      "advanced_effect": {
+        "name": "Premium Detail",
+        "intent": "luxury_soft",
+        "mood": "premium",
+        "pacing": "slow",
+        "focus": "texture",
+        "camera_motion": "push_in",
+        "intensity": 0.58,
+        "description": "Soft premium movement for texture detail."
+      },
+      "include": true
+    },
+    {
+      "scene_id": "legacy_compat",
+      "start_s": 0.75,
+      "end_s": 1.05,
+      "duration_s": 0.3,
+      "subtitle": "Legacy still works",
+      "text_effect": {
+        "name": "Slide In"
+      },
+      "advanced_effect": {
+        "name": "Glow",
+        "description": "Old schema with name and description only."
+      },
+      "include": true
+    }
+  ]
+}

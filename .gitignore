@@ -1,0 +1,43 @@
+# ============================================================
+# LONG2SHORT — .gitignore
+# ============================================================
+
+# --- Thư mục dữ liệu runtime (không đưa lên GitHub) ---
+incoming/
+rendered/
+archive/
+failed/
+
+# --- File tạm trong quá trình render ---
+renderer/temp/
+renderer/logs/
+
+# --- File output video ---
+*.mp4
+*.mov
+*.avi
+*.mkv
+
+# --- File audio tạm ---
+*.wav
+*.aac
+*.mp3
+
+# --- Cache & học máy (tự sinh ra khi chạy) ---
+effects/learned_effects.json
+renderer/temp/fontconfig/
+
+# --- macOS system files ---
+.DS_Store
+**/.DS_Store
+._*
+
+# --- Node.js ---
+node_modules/
+npm-debug.log*
+
+# --- Editor ---
+.vscode/
+.idea/
+*.swp
+*.swo

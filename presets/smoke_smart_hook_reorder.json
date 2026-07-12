@@ -1,0 +1,82 @@
+{
+  "input": "temp/smoke_hook_input.mp4",
+  "output": "temp/smoke_smart_hook_reorder_final.mp4",
+  "timeline": [
+    {
+      "scene_id": "excluded_hook",
+      "scene_type": "hook",
+      "start_s": 0,
+      "end_s": 2,
+      "duration_s": 2,
+      "subtitle": "Excluded",
+      "subtitle_style": "hook_bold",
+      "text_position": "top",
+      "retention_score": 1,
+      "hook_strength": 1,
+      "visual_energy": 1,
+      "confidence": 1,
+      "include": false
+    },
+    {
+      "scene_id": "slow_intro",
+      "scene_type": "intro",
+      "start_s": 0,
+      "end_s": 2,
+      "duration_s": 2,
+      "subtitle": "Intro",
+      "subtitle_style": "clean_white",
+      "text_position": "bottom",
+      "retention_score": 0.99,
+      "hook_strength": 0.99,
+      "visual_energy": 0.99,
+      "confidence": 0.99,
+      "include": true
+    },
+    {
+      "scene_id": "regular_demo",
+      "scene_type": "demo_main",
+      "start_s": 2,
+      "end_s": 4,
+      "duration_s": 2,
+      "subtitle": "Regular demo",
+      "subtitle_style": "clean_white",
+      "text_position": "bottom",
+      "retention_score": 0.7,
+      "hook_strength": 0.7,
+      "visual_energy": 0.7,
+      "confidence": 0.9,
+      "include": true
+    },
+    {
+      "scene_id": "satisfying_clear",
+      "scene_type": "satisfying",
+      "start_s": 4,
+      "end_s": 7,
+      "duration_s": 3,
+      "subtitle": "Satisfying clear",
+      "subtitle_style": "hook_bold",
+      "text_position": "top",
+      "visual_cue": "Bấm nút xóa, màn hình lập tức trống trơn",
+      "retention_score": 0.96,
+      "hook_strength": 0.94,
+      "visual_energy": 0.95,
+      "confidence": 0.99,
+      "include": true
+    },
+    {
+      "scene_id": "cta_scene",
+      "scene_type": "cta",
+      "start_s": 7,
+      "end_s": 9,
+      "duration_s": 2,
+      "subtitle": "CTA",
+      "subtitle_style": "cta_red",
+      "text_position": "center",
+      "retention_score": 1,
+      "hook_strength": 1,
+      "visual_energy": 1,
+      "confidence": 1,
+      "include": true
+    }
+  ]
+}

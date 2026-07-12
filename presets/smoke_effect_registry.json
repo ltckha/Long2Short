@@ -1,0 +1,62 @@
+{
+  "input": "temp/smoke_audio_input.mp4",
+  "output": "temp/smoke_effect_registry_final.mp4",
+  "timeline": [
+    {
+      "scene_id": "popup",
+      "start_s": 0,
+      "end_s": 0.25,
+      "duration_s": 0.25,
+      "subtitle": "Pop-up effect",
+      "text_effect": {
+        "name": "Pop-up"
+      },
+      "advanced_effect": {
+        "name": "Shake"
+      },
+      "include": true
+    },
+    {
+      "scene_id": "glow",
+      "start_s": 0.25,
+      "end_s": 0.5,
+      "duration_s": 0.25,
+      "subtitle": "Glow effect",
+      "text_effect": {
+        "name": "Glow"
+      },
+      "advanced_effect": {
+        "name": "Zoom In"
+      },
+      "include": true
+    },
+    {
+      "scene_id": "slide",
+      "start_s": 0.5,
+      "end_s": 0.8,
+      "duration_s": 0.3,
+      "subtitle": "Slide In effect",
+      "text_effect": {
+        "name": "Slide In"
+      },
+      "advanced_effect": {
+        "name": "Flash"
+      },
+      "include": true
+    },
+    {
+      "scene_id": "typewriter",
+      "start_s": 0.8,
+      "end_s": 1.1,
+      "duration_s": 0.3,
+      "subtitle": "Typewriter effect",
+      "text_effect": {
+        "name": "Typewriter"
+      },
+      "advanced_effect": {
+        "name": "Speed Up"
+      },
+      "include": true
+    }
+  ]
+}

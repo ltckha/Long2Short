@@ -1,0 +1,34 @@
+{
+  "input": "temp/smoke_drawtext_input.mp4",
+  "output": "temp/smoke_ai_schema_final.mp4",
+  "video_meta": {},
+  "timeline": [
+    {
+      "scene_id": "ai_1",
+      "scene_type": "hook",
+      "start_s": 0,
+      "end_s": 1,
+      "duration_s": 1,
+      "title": "Fallback title",
+      "subtitle": "AI subtitle",
+      "voice": "",
+      "visual_cue": "",
+      "text_effect": {
+        "name": "bounce"
+      },
+      "advanced_effect": {
+        "name": "zoom"
+      },
+      "confidence": 0.9,
+      "include": true
+    },
+    {
+      "scene_id": "skip_me",
+      "start_s": 0,
+      "end_s": 1,
+      "duration_s": 1,
+      "subtitle": "Skip",
+      "include": false
+    }
+  ]
+}

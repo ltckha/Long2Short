@@ -1,0 +1,56 @@
+{
+  "input": "temp/smoke_audio_input.mp4",
+  "output": "temp/smoke_subtitle_registry_final.mp4",
+  "timeline": [
+    {
+      "scene_id": "clean",
+      "scene_type": "demo",
+      "start_s": 0,
+      "end_s": 0.25,
+      "duration_s": 0.25,
+      "subtitle": "Clean white subtitle",
+      "subtitle_style": "clean_white",
+      "include": true
+    },
+    {
+      "scene_id": "hook",
+      "scene_type": "hook",
+      "start_s": 0.25,
+      "end_s": 0.5,
+      "duration_s": 0.25,
+      "subtitle": "Hook bold subtitle",
+      "subtitle_style": "hook_bold",
+      "include": true
+    },
+    {
+      "scene_id": "neon",
+      "scene_type": "hook",
+      "start_s": 0.5,
+      "end_s": 0.75,
+      "duration_s": 0.25,
+      "subtitle": "Neon glow subtitle",
+      "subtitle_style": "neon_glow",
+      "include": true
+    },
+    {
+      "scene_id": "cta",
+      "scene_type": "cta",
+      "start_s": 0.75,
+      "end_s": 1,
+      "duration_s": 0.25,
+      "subtitle": "CTA red subtitle",
+      "subtitle_style": "cta_red",
+      "include": true
+    },
+    {
+      "scene_id": "alias",
+      "scene_type": "demo",
+      "start_s": 1,
+      "end_s": 1.15,
+      "duration_s": 0.15,
+      "subtitle": "Alias fallback",
+      "subtitle_style": "tiktok_yellow",
+      "include": true
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "input": "temp/smoke_audio_input.mp4",
+  "output": "temp/smoke_audio_final.mp4",
+  "timeline": [
+    {
+      "scene_id": "audio_1",
+      "start_s": 0,
+      "end_s": 1.1,
+      "duration_s": 1.1,
+      "subtitle": "Đây là một subtitle khá dài để kiểm tra tự động xuống dòng trong vùng an toàn của video TikTok/Reels",
+      "text_effect": {
+        "name": "fade"
+      },
+      "advanced_effect": {
+        "name": "flash"
+      },
+      "include": true
+    }
+  ]
+}

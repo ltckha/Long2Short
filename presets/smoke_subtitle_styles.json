@@ -1,0 +1,68 @@
+{
+  "input": "temp/smoke_audio_input.mp4",
+  "output": "temp/smoke_subtitle_styles_final.mp4",
+  "timeline": [
+    {
+      "scene_id": "hook_style",
+      "scene_type": "hook",
+      "start_s": 0,
+      "end_s": 0.3,
+      "duration_s": 0.3,
+      "subtitle": "Hook nhiều dòng cần căn giữa đẹp trong safe area",
+      "text_effect": {
+        "name": "Pop-up"
+      },
+      "advanced_effect": {
+        "name": "Flash"
+      },
+      "include": true
+    },
+    {
+      "scene_id": "demo_style",
+      "scene_type": "demo",
+      "start_s": 0.3,
+      "end_s": 0.6,
+      "duration_s": 0.3,
+      "subtitle": "Demo clean white subtitle multi line",
+      "subtitle_style": "clean_white",
+      "text_effect": {
+        "name": "Bounce"
+      },
+      "advanced_effect": {
+        "name": "Zoom In"
+      },
+      "include": true
+    },
+    {
+      "scene_id": "cta_style",
+      "scene_type": "cta",
+      "start_s": 0.6,
+      "end_s": 0.9,
+      "duration_s": 0.3,
+      "subtitle": "CTA nổi bật màu mạnh",
+      "text_effect": {
+        "name": "Glow"
+      },
+      "advanced_effect": {
+        "name": "Shake"
+      },
+      "include": true
+    },
+    {
+      "scene_id": "fallback_style",
+      "scene_type": "demo",
+      "start_s": 0.9,
+      "end_s": 1.1,
+      "duration_s": 0.2,
+      "subtitle": "Preset không tồn tại fallback",
+      "subtitle_style": "unknown_style",
+      "text_effect": {
+        "name": "Slide In"
+      },
+      "advanced_effect": {
+        "name": "Speed Up"
+      },
+      "include": true
+    }
+  ]
+}
