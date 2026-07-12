@@ -6,7 +6,8 @@
   "type": "commonjs",
   "scripts": {
     "render": "node scripts/render.js",
-    "render:shoe": "node scripts/render.js shoe_001"
+    "render:shoe": "node scripts/render.js shoe_001",
+    "sync-prompt": "node scripts/syncPromptEnums.js"
   },
   "engines": {
     "node": ">=18"

@@ -1,4 +1,6 @@
 const { resolveLearnedAdvancedEffect } = require("./effectLearning");
+const _enumsRaw = require("../config/effectEnums.json");
+
 
 function normalizeEffectKey(value) {
   if (!value) return "none";
@@ -13,30 +15,10 @@ function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
 }
 
-const ADVANCED_EFFECT_ENUMS = {
-  intent: new Set([
-    "viral_fast",
-    "reveal_impact",
-    "premium_showcase",
-    "luxury_soft",
-    "dramatic_focus",
-    "satisfying_cut",
-    "energetic_demo",
-    "cinematic_transition",
-  ]),
-  mood: new Set([
-    "aggressive",
-    "premium",
-    "energetic",
-    "satisfying",
-    "playful",
-    "emotional",
-    "dramatic",
-  ]),
-  pacing: new Set(["slow", "medium", "fast", "pulse", "dynamic"]),
-  focus: new Set(["product", "texture", "packaging", "reveal", "hand_action", "logo"]),
-  camera_motion: new Set(["static", "push_in", "push_out", "drift", "snap", "overshoot", "pulse"]),
-};
+const ADVANCED_EFFECT_ENUMS = Object.fromEntries(
+  Object.entries(_enumsRaw).map(([key, values]) => [key, new Set(values)])
+);
+
 
 function normalizeAdvancedEffect(effect) {
   if (!effect) {
@@ -585,6 +567,20 @@ function applySemanticMotionPlan(plan, effect, intensity) {
     plan.glow = { intensity: soft * 0.6 };
   }
 
+  if (effect.intent === "tension_build") {
+    setZoomPlan(plan, "push_in", soft * 0.85);
+    plan.speed = { type: "slow_down", intensity: soft * 0.65 };
+    plan.glow = strongerPlan(plan.glow, soft * 0.55);
+    plan.easing = "smooth";
+  }
+
+  if (effect.intent === "emotional_pause") {
+    plan.speed = { type: "slow_down", intensity: soft * 0.45 };
+    plan.glow = strongerPlan(plan.glow, soft * 0.72);
+    plan.drift = clamp((plan.drift || 0) + 0.15, 0, 1);
+    plan.easing = "soft";
+  }
+
   applyMoodModifiers(plan, effect, intensity);
   applyPacingModifiers(plan, effect, intensity);
   applyFocusModifiers(plan, effect, intensity);
@@ -598,6 +594,11 @@ function applyMoodModifiers(plan, effect, intensity) {
     plan.flash = strongerPlan(plan.flash, intensity * 0.75);
   }
   if (mood === "premium") plan.glow = strongerPlan(plan.glow, intensity * 0.78);
+  if (mood === "soft") {
+    plan.glow = strongerPlan(plan.glow, intensity * 0.55);
+    if (!plan.zoom) setZoomPlan(plan, "drift", intensity * 0.45);
+    plan.easing = "soft";
+  }
   if (mood === "energetic") plan.speed = plan.speed || { type: "speed_up", intensity };
   if (mood === "satisfying") plan.speed = plan.speed || { type: "pulse", intensity: intensity * 0.7 };
   if (mood === "playful" && !plan.zoom) setZoomPlan(plan, "pulse", intensity * 0.68);

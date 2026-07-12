@@ -1,0 +1,27 @@
+{
+  "intent": [
+    "viral_fast",
+    "reveal_impact",
+    "premium_showcase",
+    "luxury_soft",
+    "dramatic_focus",
+    "satisfying_cut",
+    "energetic_demo",
+    "cinematic_transition",
+    "tension_build",
+    "emotional_pause"
+  ],
+  "mood": [
+    "aggressive",
+    "premium",
+    "energetic",
+    "satisfying",
+    "playful",
+    "emotional",
+    "dramatic",
+    "soft"
+  ],
+  "pacing": ["slow", "medium", "fast", "pulse", "dynamic"],
+  "focus": ["product", "texture", "packaging", "reveal", "hand_action", "logo"],
+  "camera_motion": ["static", "push_in", "push_out", "drift", "snap", "overshoot", "pulse"]
+}
