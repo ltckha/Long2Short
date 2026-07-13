@@ -4,9 +4,11 @@ const path = require("path");
 const WORKSPACE_ROOT = path.resolve(__dirname, "..", "..");
 const EFFECTS_DIR = path.join(WORKSPACE_ROOT, "effects");
 const LEARNED_EFFECTS_PATH = path.join(EFFECTS_DIR, "learned_effects.json");
+const STATS_PATH = path.join(EFFECTS_DIR, "effect_success_stats.json");
 const DEFAULT_SAFE_EFFECT = "zoom_soft";
 const RECENT_LOG_LIMIT = 8;
 const AUTO_ALIAS_THRESHOLD = 5;
+
 
 const KEYWORD_MAPPINGS = [
   { keyword: "smooth", mapped: "zoom_soft" },
@@ -168,9 +170,11 @@ function resolveLearnedAdvancedEffect(name, supportedRegistry) {
     return buildLearningResult(name, requested, similar.mapped, "similarity_learning", similar.keyword);
   }
 
-  persistLearnedEffect(requested, DEFAULT_SAFE_EFFECT);
-  return buildLearningResult(name, requested, DEFAULT_SAFE_EFFECT, "safe_default");
+  const safeEffect = selectSafeEffect();
+  persistLearnedEffect(requested, safeEffect);
+  return buildLearningResult(name, requested, safeEffect, "safe_default");
 }
+
 
 function persistLearnedEffect(requested, mapped) {
   if (!requested || requested === "none") return;
@@ -185,8 +189,9 @@ function learnFrequentFallbacksFromLogs() {
     if (count < AUTO_ALIAS_THRESHOLD || learnedEffects[requested]) continue;
     const heuristic = matchHeuristic(requested);
     const similar = heuristic ? null : matchSimilarity(requested, {});
-    const mapped = heuristic ? heuristic.mapped : similar ? similar.mapped : DEFAULT_SAFE_EFFECT;
+    const mapped = heuristic ? heuristic.mapped : similar ? similar.mapped : selectSafeEffect();
     learnedEffects[requested] = mapped;
+
     changed = true;
   }
 
@@ -328,11 +333,167 @@ function sortObject(value) {
   return Object.fromEntries(Object.entries(value).sort(([a], [b]) => a.localeCompare(b)));
 }
 
+function loadEffectStats() {
+  try {
+    if (fs.existsSync(STATS_PATH)) {
+      return JSON.parse(fs.readFileSync(STATS_PATH, "utf8"));
+    }
+  } catch {}
+  return {
+    _meta: {
+      bootstrapped: false,
+      last_log_scanned: "",
+      rr_index: 0,
+    },
+  };
+}
+
+function saveEffectStats(stats) {
+  try {
+    fs.mkdirSync(EFFECTS_DIR, { recursive: true });
+    fs.writeFileSync(STATS_PATH, `${JSON.stringify(stats, null, 2)}\n`);
+  } catch {}
+}
+
+function parseLogContentForStats(content) {
+  const lines = content.split(/\r?\n/);
+  const sceneEffects = [];
+  let lastSceneIndex = -1;
+  let allScenesRendered = false;
+  let firstErrorSceneIndex = -1;
+
+  for (const line of lines) {
+    if (line.includes("Concat") || line.includes("concatScenes") || line.includes("Render completed:")) {
+      allScenesRendered = true;
+    }
+    const sceneMatch = line.match(/Render scene (\d+)\/(\d+): .*?advanced_effect=(.+)$/);
+    if (sceneMatch) {
+      lastSceneIndex = sceneEffects.length;
+      const raw = sceneMatch[3].trim();
+      const hasArrow = raw.includes("->");
+      const rawEffect = hasArrow ? raw.split("->")[1].trim() : raw;
+      const effKey = normalizeRegistryKey(rawEffect);
+      sceneEffects.push(effKey);
+      continue;
+    }
+    if (line.includes("ERROR:") && firstErrorSceneIndex === -1 && !allScenesRendered) {
+      if (lastSceneIndex >= 0) {
+        firstErrorSceneIndex = lastSceneIndex;
+      }
+    }
+  }
+
+  if (firstErrorSceneIndex !== -1) {
+    const failedEffect = sceneEffects[firstErrorSceneIndex];
+    return {
+      successes: [],
+      failures: failedEffect && failedEffect !== "none" && failedEffect !== "fallback" ? [failedEffect] : [],
+    };
+  } else {
+    const hasAnyError = lines.some((l) => l.includes("ERROR:"));
+    if (hasAnyError) {
+      return { successes: [], failures: [] };
+    }
+    const successes = unique(sceneEffects.filter((e) => e && e !== "none" && e !== "fallback"));
+    return { successes, failures: [] };
+  }
+}
+
+function applyLogStats(stats, logContent) {
+  const { successes, failures } = parseLogContentForStats(logContent);
+  for (const eff of successes) {
+    if (!stats[eff]) stats[eff] = { success: 0, fail: 0 };
+    stats[eff].success = (stats[eff].success || 0) + 1;
+  }
+  for (const eff of failures) {
+    if (!stats[eff]) stats[eff] = { success: 0, fail: 0 };
+    stats[eff].fail = (stats[eff].fail || 0) + 1;
+  }
+}
+
+function bootstrapEffectStatsIfNeeded(logDir) {
+  const stats = loadEffectStats();
+  if (stats._meta && stats._meta.bootstrapped) return stats;
+
+  let scanned = 0;
+  if (fs.existsSync(logDir)) {
+    const files = fs.readdirSync(logDir).filter((f) => f.endsWith(".log"));
+    for (const file of files) {
+      const filePath = path.join(logDir, file);
+      try {
+        const content = fs.readFileSync(filePath, "utf8");
+        applyLogStats(stats, content);
+        scanned++;
+      } catch {}
+    }
+  }
+
+  stats._meta = stats._meta || {};
+  stats._meta.bootstrapped = true;
+  saveEffectStats(stats);
+  console.log(`[SuccessStats] Bootstrap: scanned ${scanned} files`);
+  return stats;
+}
+
+function updateEffectStatsFromLog(logPath) {
+  const stats = loadEffectStats();
+  try {
+    if (fs.existsSync(logPath)) {
+      const content = fs.readFileSync(logPath, "utf8");
+      applyLogStats(stats, content);
+      stats._meta = stats._meta || {};
+      stats._meta.last_log_scanned = logPath;
+      saveEffectStats(stats);
+    }
+  } catch {}
+  return stats;
+}
+
+function getSafePool(stats, options = {}) {
+  const minSamples = options.minSamples ?? 5;
+  const minSuccessRate = options.minSuccessRate ?? 0.9;
+  const poolSize = options.poolSize ?? 5;
+
+  const entries = [];
+  for (const [key, value] of Object.entries(stats || {})) {
+    if (key === "_meta" || key === "fallback" || key === "none" || !value || typeof value !== "object") continue;
+    const success = Number(value.success) || 0;
+    const fail = Number(value.fail) || 0;
+    const total = success + fail;
+    const rate = success / Math.max(1, total);
+    if (total >= minSamples && rate >= minSuccessRate) {
+      entries.push({ key, total, rate });
+    }
+  }
+
+  entries.sort((a, b) => b.total - a.total || a.key.localeCompare(b.key));
+  return entries.slice(0, poolSize).map((item) => item.key);
+}
+
+function selectSafeEffect() {
+  const stats = loadEffectStats();
+  const pool = getSafePool(stats);
+  if (!pool || pool.length === 0) {
+    return DEFAULT_SAFE_EFFECT;
+  }
+  stats._meta = stats._meta || {};
+  const index = (Number(stats._meta.rr_index) || 0) % pool.length;
+  const selected = pool[index];
+  stats._meta.rr_index = (index + 1) % pool.length;
+  saveEffectStats(stats);
+  return selected;
+}
+
 module.exports = {
+  bootstrapEffectStatsIfNeeded,
   createEffectAnalytics,
   getLearnedEffectsPath,
   getRecentLogAnalysis,
+  getSafePool,
   initializeEffectLearning,
   normalizeLearningKey,
   resolveLearnedAdvancedEffect,
+  selectSafeEffect,
+  updateEffectStatsFromLog,
 };
+

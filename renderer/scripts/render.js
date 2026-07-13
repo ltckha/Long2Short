@@ -33,9 +33,11 @@ const {
   summarizeMotionPlan,
 } = require("./effects");
 const {
+  bootstrapEffectStatsIfNeeded,
   createEffectAnalytics,
   getLearnedEffectsPath,
   initializeEffectLearning,
+  updateEffectStatsFromLog,
 } = require("./effectLearning");
 const {
   archiveFailedRender,
@@ -1533,6 +1535,7 @@ async function main() {
   }
 
   await assertFfmpeg();
+  bootstrapEffectStatsIfNeeded(LOG_DIR);
 
   for (const project of projects) {
     configureProject(project);
@@ -1543,6 +1546,8 @@ async function main() {
       if (requestedProject) {
         throw error;
       }
+    } finally {
+      updateEffectStatsFromLog(logPath);
     }
   }
 }

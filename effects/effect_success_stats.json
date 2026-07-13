@@ -1,0 +1,47 @@
+{
+  "_meta": {
+    "bootstrapped": true,
+    "last_log_scanned": "",
+    "rr_index": 0
+  },
+  "speedup": {
+    "success": 27,
+    "fail": 0
+  },
+  "zoomsoft": {
+    "success": 33,
+    "fail": 0
+  },
+  "shake": {
+    "success": 43,
+    "fail": 0
+  },
+  "zoomin": {
+    "success": 29,
+    "fail": 0
+  },
+  "overshootzoom": {
+    "success": 7,
+    "fail": 0
+  },
+  "flash": {
+    "success": 28,
+    "fail": 0
+  },
+  "speedrampfast": {
+    "success": 6,
+    "fail": 0
+  },
+  "driftcam": {
+    "success": 1,
+    "fail": 0
+  },
+  "speedramp": {
+    "success": 5,
+    "fail": 0
+  },
+  "zoom": {
+    "success": 1,
+    "fail": 0
+  }
+}
