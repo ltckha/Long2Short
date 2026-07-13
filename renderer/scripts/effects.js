@@ -491,9 +491,15 @@ function buildMotionPlan(scene, effect) {
     plan.flash = { intensity };
   }
 
-  if (effectKey === "glitch" || (plan.flash && intensity > 0.82)) {
+  if (
+    effectKey === "glitch" ||
+    (plan.flash && intensity > 0.82) ||
+    (semanticEffect.mood === "aggressive" && ["fast", "pulse"].includes(semanticEffect.pacing)) ||
+    (semanticEffect.intent === "viral_fast" && intensity > 0.7)
+  ) {
     plan.rgbSplit = { intensity: Math.min(intensity, 0.9) };
   }
+
 
   if (["hook", "satisfying"].includes(normalizeSemanticText(scene.scene_type || scene.sceneType))) {
     plan.zoom = plan.zoom || { type: "punch", intensity: Math.max(intensity, 0.72) };
@@ -655,6 +661,11 @@ function applyFocusModifiers(plan, effect, intensity) {
   if (focus === "logo") {
     addZoomStrength(plan, 0.08, "push_in", intensity * 0.55);
     plan.sharpen = clamp(plan.sharpen + 0.12, 0, 1);
+  }
+
+  if (focus === "reveal" || ["dramatic", "premium"].includes(effect.mood)) {
+    plan.sharpen = clamp(plan.sharpen + 0.2, 0, 1);
+    plan.contrast = clamp(plan.contrast + 0.1, 0, 1);
   }
 }
 

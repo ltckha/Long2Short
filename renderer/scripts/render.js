@@ -515,6 +515,15 @@ function createOpeningHookScene(sourceScene, duration) {
     ? Math.max(0, Math.min(sourceDuration - duration, sourceDuration * 0.35))
     : 0;
 
+  let advancedEffect = sourceScene.advancedEffect;
+  if (advancedEffect && typeof advancedEffect === "object") {
+    const baseIntensity = typeof advancedEffect.intensity === "number" ? advancedEffect.intensity : 0.8;
+    advancedEffect = {
+      ...advancedEffect,
+      intensity: Math.min(1.0, baseIntensity * 1.1),
+    };
+  }
+
   return {
     ...sourceScene,
     id: `opening_hook_${safeName(sourceScene.id)}`,
@@ -530,7 +539,7 @@ function createOpeningHookScene(sourceScene, duration) {
     speedStrategy: "uniform",
     renderPriority: "keep",
     textEffect: sourceScene.textEffect === "none" ? "Pop-up" : sourceScene.textEffect,
-    advancedEffect: "none",
+    advancedEffect,
   };
 }
 
