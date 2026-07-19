@@ -48,6 +48,11 @@ const { resolveFont } = require("./fontRegistry");
 const { prepareSubtitleLayout, wrapSubtitleText } = require("./subtitleLayoutEngine");
 const { resolveSubtitleStyle } = require("./subtitleStyles");
 const { getSubtitlePosition } = require("./textPositionEngine");
+const {
+  buildTransitionFilterComplex,
+  computeXfadeOffsets,
+  hasAnyTransitions,
+} = require("./transitions");
 
 const ROOT = path.resolve(__dirname, "..");
 const WORKSPACE_ROOT = path.resolve(ROOT, "..");
@@ -1405,6 +1410,48 @@ async function concatScenes(sceneFiles, outputPath) {
   }
 }
 
+async function concatScenesWithTransitions(sceneFiles, scenes, outputPath) {
+  const steps = computeXfadeOffsets(scenes);
+  const filterComplexStr = buildTransitionFilterComplex(sceneFiles.length, steps);
+
+  const args = ["-hide_banner", "-y"];
+  for (const file of sceneFiles) {
+    args.push("-i", file);
+  }
+
+  args.push(
+    "-filter_complex",
+    filterComplexStr,
+    "-map",
+    "[vout]",
+    "-map",
+    "[aout]",
+    "-c:v",
+    "libx264",
+    "-preset",
+    "veryfast",
+    "-crf",
+    "20",
+    "-r",
+    String(TARGET.fps),
+    "-pix_fmt",
+    "yuv420p",
+    "-c:a",
+    "aac",
+    "-b:a",
+    "160k",
+    "-ac",
+    "2",
+    "-ar",
+    "44100",
+    "-movflags",
+    "+faststart",
+    outputPath
+  );
+
+  await run("ffmpeg", args, "concat scenes with transitions");
+}
+
 async function assertFfmpeg() {
   try {
     await run("ffmpeg", ["-version"], "check ffmpeg");
@@ -1477,7 +1524,13 @@ async function renderCurrentProject() {
     sceneFiles.push(await renderScene(inputVideo, scene));
   }
 
-  await concatScenes(sceneFiles, outputPath);
+  if (hasAnyTransitions(scenes)) {
+    log("[Transition] Có ít nhất 1 transition_out hợp lệ, sử dụng concatScenesWithTransitions.");
+    await concatScenesWithTransitions(sceneFiles, scenes, outputPath);
+  } else {
+    log("[Transition] Không có transition_out, dùng concatScenes thông thường.");
+    await concatScenes(sceneFiles, outputPath);
+  }
   writeEffectAnalyticsReport(createEffectAnalytics(advancedEffectsUsed));
   log(`Render completed: project=${videoId} output=${outputPath}`);
   cleanupTempDir();

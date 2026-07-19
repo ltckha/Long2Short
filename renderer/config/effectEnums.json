@@ -23,5 +23,6 @@
   ],
   "pacing": ["slow", "medium", "fast", "pulse", "dynamic"],
   "focus": ["product", "texture", "packaging", "reveal", "hand_action", "logo"],
-  "camera_motion": ["static", "push_in", "push_out", "drift", "snap", "overshoot", "pulse"]
+  "camera_motion": ["static", "push_in", "push_out", "drift", "snap", "overshoot", "pulse"],
+  "transition_type": ["fade", "wipe_left", "wipe_right", "slide_up", "circle_open", "pixelize"]
 }

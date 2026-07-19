@@ -27,6 +27,7 @@ const FIELD_LABELS = {
   pacing: "advanced_effect.pacing",
   focus: "advanced_effect.focus",
   camera_motion: "advanced_effect.camera_motion",
+  transition_type: "transition_out.type",
 };
 
 function buildEnumSection(enums) {
@@ -48,6 +49,45 @@ function buildEnumSection(enums) {
 
   lines.push(SECTION_END);
   return lines.join("\n");
+}
+
+const BACKUP_DIR = path.join(ROOT, "renderer", "prompts", "backups");
+
+function backupPromptFile(promptPath) {
+  try {
+    if (!fs.existsSync(promptPath)) return;
+
+    fs.mkdirSync(BACKUP_DIR, { recursive: true });
+
+    const now = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+    const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+
+    const backupName = `timeline_generator_prompt.backup_${timestamp}.md`;
+    const backupPath = path.join(BACKUP_DIR, backupName);
+
+    fs.copyFileSync(promptPath, backupPath);
+    console.log(`[sync-prompt] Đã tạo bản backup: ${backupPath}`);
+
+    const files = fs
+      .readdirSync(BACKUP_DIR)
+      .filter((f) => f.startsWith("timeline_generator_prompt.backup_") && f.endsWith(".md"))
+      .map((f) => {
+        const filePath = path.join(BACKUP_DIR, f);
+        return { name: f, path: filePath, mtime: fs.statSync(filePath).mtimeMs };
+      });
+
+    if (files.length > 10) {
+      files.sort((a, b) => a.mtime - b.mtime);
+      const toDeleteCount = files.length - 10;
+      for (let i = 0; i < toDeleteCount; i++) {
+        fs.unlinkSync(files[i].path);
+        console.log(`[sync-prompt] Đã tự động xóa bản backup cũ: ${files[i].name}`);
+      }
+    }
+  } catch (err) {
+    console.warn(`[sync-prompt] WARN: Lỗi tạo backup: ${err.message}`);
+  }
 }
 
 function main() {
@@ -79,6 +119,7 @@ function main() {
     console.log("[sync-prompt] Đã thêm section ENUM_VALID_VALUES vào cuối prompt.");
   }
 
+  backupPromptFile(PROMPT_PATH);
   fs.writeFileSync(PROMPT_PATH, prompt, "utf8");
 
   console.log("[sync-prompt] ✅ Hoàn tất. File đã được cập nhật:");

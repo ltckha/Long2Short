@@ -1,7 +1,7 @@
 {
   "_meta": {
     "bootstrapped": true,
-    "last_log_scanned": "",
+    "last_log_scanned": "/Users/khan/Library/CloudStorage/Nextcloud-ltckha@nc․giayhainancy․vn/Share_Folder/Long2Short/renderer/logs/ai_20260719_142543_render.log",
     "rr_index": 0
   },
   "speedup": {
@@ -9,19 +9,19 @@
     "fail": 0
   },
   "zoomsoft": {
-    "success": 33,
+    "success": 36,
     "fail": 0
   },
   "shake": {
-    "success": 43,
+    "success": 44,
     "fail": 0
   },
   "zoomin": {
-    "success": 29,
+    "success": 31,
     "fail": 0
   },
   "overshootzoom": {
-    "success": 7,
+    "success": 8,
     "fail": 0
   },
   "flash": {

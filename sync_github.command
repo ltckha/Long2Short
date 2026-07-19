@@ -1,7 +1,8 @@
 #!/bin/bash
 
-SCRIPT_DIR="$( cd "$(dirname "$0")" && pwd )"
-cd "$SCRIPT_DIR"
+# Di chuyển đến thư mục dự án Nextcloud cố định
+PROJECT_DIR="/Users/khan/Library/CloudStorage/Nextcloud-ltckha@nc․giayhainancy․vn/Share_Folder/Long2Short"
+cd "$PROJECT_DIR"
 
 echo "================================="
 echo "   LONG2SHORT — SYNC TO GITHUB"
