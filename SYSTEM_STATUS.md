@@ -14,8 +14,8 @@ Tài liệu này đóng vai trò là **Bộ nhớ Trạng thái Cục bộ (Loca
 
 ## 2. Các Mốc Chỉnh sửa & Cấu hình Quan trọng (Status: Đang Hoạt Động Tốt)
 
-### 📌 Cấp quyền & Đường dẫn động (`start_render.command`)
-- **Vị trí:** [start_render.command](file:///Users/khan/Library/CloudStorage/Nextcloud-ltckha@nc․giayhainancy․vn/Share_Folder/Long2Short/start_render.command)
+### 📌 Cấp quyền & Đường dẫn động (`render_long2short.command`)
+- **Vị trí:** [render_long2short.command](file:///Users/khan/Library/CloudStorage/Nextcloud-ltckha@nc․giayhainancy․vn/Share_Folder/Long2Short/render_long2short.command)
 - **Tính năng:** Tự động nhận diện thư mục chạy thực tế (`SCRIPT_DIR`) để di chuyển đến đúng vị trí, cho phép dự án hoạt động portable ở bất kỳ đâu.
 - **Quyền hạn:** Đã cấp quyền `chmod 755` và xóa hoàn toàn cờ quarantine của macOS.
 
