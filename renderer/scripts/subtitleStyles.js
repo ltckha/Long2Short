@@ -331,7 +331,21 @@ const subtitleStyleRegistry = {
   },
 
   cta_red: {
-    alias: "minimal_cta",
+    displayName: "cta_red",
+    font: "SF Pro Display",
+    fontsize: 82,
+    fontcolor: "0xFF2A2A",
+    borderw: "4",
+    bordercolor: "0xFFFFFF@0.96",
+    shadowx: "0",
+    shadowy: "4",
+    shadowcolor: "0x000000@0.60",
+    box: true,
+    boxcolor: "0x111111@0.88",
+    boxborderw: "18",
+    lineSpacingScale: 0.95,
+    maxLines: 2,
+    animation: "card_settle",
   },
 
   tiktok_yellow: {
