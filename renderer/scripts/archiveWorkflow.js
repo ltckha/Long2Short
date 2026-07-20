@@ -26,7 +26,7 @@ function archiveSuccessfulRender(workflow, log) {
 
   moveFile(workflow.timelinePath, projectDir, log);
   moveFile(workflow.outputPath, projectDir, log);
-  moveFile(workflow.inputVideo, workflow.renderedDir, log);
+  deleteIncomingInputVideo(workflow.inputVideo, workflow.incomingDir, workflow.projectId, log);
 
   // Di chuyển toàn bộ WAV voice files vào archive
   moveVoiceWavFiles(workflow.incomingDir, workflow.projectId, projectDir, log);
@@ -41,18 +41,29 @@ function archiveFailedRender(workflow, log) {
   if (!workflow.enabled) return;
 
   const projectDir = path.join(workflow.failedDir, workflow.projectId);
-  log(`Render lỗi, move source sang failed project=${workflow.projectId} dir=${projectDir}`);
+  log(`Render lỗi, dọn dẹp dự án=${workflow.projectId} dir=${projectDir}`);
   fs.mkdirSync(projectDir, { recursive: true });
 
-  moveFile(
-    workflow.inputVideo || path.join(workflow.incomingDir, `${workflow.projectId}.mp4`),
-    projectDir,
-    log
-  );
+  deleteIncomingInputVideo(workflow.inputVideo, workflow.incomingDir, workflow.projectId, log);
   moveFile(workflow.timelinePath, projectDir, log);
 
   // Xóa WAV voice files khỏi incoming khi render thất bại
   moveVoiceWavFiles(workflow.incomingDir, workflow.projectId, projectDir, log);
+}
+
+function deleteIncomingInputVideo(inputVideo, incomingDir, projectId, log) {
+  try {
+    const tempVideoPath = inputVideo || path.join(incomingDir, `${projectId}.mp4`);
+    if (tempVideoPath && fs.existsSync(tempVideoPath)) {
+      const relative = path.relative(incomingDir, tempVideoPath);
+      if (relative && !relative.startsWith("..") && !path.isAbsolute(relative)) {
+        fs.rmSync(tempVideoPath, { force: true });
+        log(`[Cleanup] Đã xóa file video copy tạm trong incoming: ${tempVideoPath}`);
+      }
+    }
+  } catch (err) {
+    log(`[Cleanup] WARN: Không thể xóa file video tạm trong incoming: ${err.message}`);
+  }
 }
 
 function moveVoiceWavFiles(incomingDir, projectId, targetDir, log) {
