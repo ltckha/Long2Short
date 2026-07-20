@@ -1,8 +1,5 @@
 #!/bin/bash
-
-# Di chuyển đến thư mục dự án Nextcloud cố định
-PROJECT_DIR="/Users/khan/Library/CloudStorage/Nextcloud-ltckha@nc․giayhainancy․vn/Share_Folder/Long2Short"
-cd "$PROJECT_DIR"
+cd "$(dirname "$0")"
 
 echo "========================="
 echo " AI VIDEO FACTORY"

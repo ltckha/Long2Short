@@ -1,15 +1,11 @@
 #!/bin/bash
-
-# Di chuyển đến thư mục dự án Nextcloud cố định
-PROJECT_DIR="/Users/khan/Library/CloudStorage/Nextcloud-ltckha@nc․giayhainancy․vn/Share_Folder/Long2Short"
-cd "$PROJECT_DIR"
+cd "$(dirname "$0")"
 
 echo "================================="
 echo "   LONG2SHORT — SYNC TO GITHUB"
 echo "================================="
 echo ""
 
-# Kiểm tra có thay đổi gì không
 if git diff --quiet && git diff --cached --quiet; then
   echo "✅ Không có thay đổi nào cần đồng bộ."
   echo ""
@@ -17,12 +13,10 @@ if git diff --quiet && git diff --cached --quiet; then
   exit 0
 fi
 
-# Hiển thị danh sách file thay đổi
 echo "📂 Các file thay đổi:"
 git status --short
 echo ""
 
-# Nhập commit message (hoặc dùng mặc định theo thời gian)
 read -p "💬 Nhập mô tả thay đổi (Enter để dùng timestamp): " COMMIT_MSG
 
 if [ -z "$COMMIT_MSG" ]; then
