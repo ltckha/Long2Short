@@ -147,6 +147,78 @@ async function generateContentWithRetryFallback(ai, models, contents, config) {
   throw lastError || new Error("Tất cả các mô hình Gemini trong danh sách đều quá tải hoặc thất bại.");
 }
 
+function validateAndFixTimelineTimestamps(timelineJson, videoPath) {
+  if (!timelineJson || !Array.isArray(timelineJson.timeline)) return timelineJson;
+
+  let videoDuration = 0;
+  try {
+    const cmd = `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${videoPath}"`;
+    const out = require("child_process").execSync(cmd, { encoding: "utf8" }).trim();
+    videoDuration = parseFloat(out) || 0;
+  } catch {}
+
+  if (videoDuration <= 0) return timelineJson;
+
+  let fixedCount = 0;
+  const scenes = timelineJson.timeline;
+
+  for (let i = 0; i < scenes.length; i++) {
+    const s = scenes[i];
+    let start = Number(s.start_s ?? s.start) || 0;
+    let end = Number(s.end_s ?? s.end) || 0;
+
+    // Phát hiện và tự động sửa lỗi AI nhầm mốc M:SS -> MSS (Ví dụ 1:15 -> 115)
+    if (start >= videoDuration && start >= 100) {
+      const min = Math.floor(start / 100);
+      const sec = start % 100;
+      if (sec < 60) {
+        const converted = min * 60 + sec;
+        if (converted < videoDuration) {
+          console.log(
+            `[AutoCorrect] ⚠️ Phát hiện AI nhầm mốc thời gian M:SS (${min}:${sec < 10 ? "0" + sec : sec}). Tự động chuyển start_s từ ${start}s -> ${converted}s`
+          );
+          start = converted;
+          fixedCount++;
+        }
+      }
+    }
+
+    if (end >= videoDuration && end >= 100) {
+      const min = Math.floor(end / 100);
+      const sec = end % 100;
+      if (sec < 60) {
+        const converted = min * 60 + sec;
+        if (converted <= videoDuration + 1) {
+          console.log(
+            `[AutoCorrect] ⚠️ Phát hiện AI nhầm mốc thời gian M:SS (${min}:${sec < 10 ? "0" + sec : sec}). Tự động chuyển end_s từ ${end}s -> ${converted}s`
+          );
+          end = converted;
+          fixedCount++;
+        }
+      }
+    }
+
+    // Clamp an toàn nếu vẫn vượt quá độ dài video gốc
+    if (start >= videoDuration - 0.5) {
+      start = Math.max(0, videoDuration - 5);
+      fixedCount++;
+    }
+    if (end > videoDuration) {
+      end = videoDuration;
+      fixedCount++;
+    }
+
+    s.start_s = Number(start.toFixed(2));
+    s.end_s = Number(end.toFixed(2));
+  }
+
+  if (fixedCount > 0) {
+    console.log(`[AutoCorrect] ✅ Đã tự động hiệu chỉnh an toàn ${fixedCount} mốc thời gian trong kịch bản JSON!`);
+  }
+
+  return timelineJson;
+}
+
 async function main() {
   const videoPathArg = process.argv[2];
   if (!videoPathArg) {
@@ -241,6 +313,9 @@ async function main() {
       console.log("[AI] Dữ liệu thô từ AI:", responseText);
       throw new Error(`Phản hồi không phải là JSON hợp lệ: ${jsonErr.message}`);
     }
+
+    // Tự động kiểm tra và hiệu chỉnh mốc thời gian an toàn
+    timelineJson = validateAndFixTimelineTimestamps(timelineJson, absoluteVideoPath);
 
     // Đảm bảo thư mục incoming tồn tại
     fs.mkdirSync(INCOMING_DIR, { recursive: true });
