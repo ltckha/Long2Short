@@ -24,10 +24,8 @@ function generateSwatches() {
     const safeArea = { topRatio: 0.15, centerRatio: 0.46, bottomRatio: 0.13 };
     const pos = getSubtitlePosition("top", safeArea);
 
-    const txtFile = path.join(OUTPUT_DIR, `temp_${item.key}.txt`);
-    fs.writeFileSync(txtFile, item.text, "utf8");
-
     const fontFile = "/System/Library/Fonts/HelveticaNeue.ttc";
+    const escapedText = item.text.replace(/'/g, "'\\\\''");
 
     let filterStr = "";
     if (style.layers && style.layers.length > 0) {
@@ -43,16 +41,16 @@ function generateSwatches() {
           const boxcolor = layer.boxcolor || style.boxcolor || "black@0.0";
           const boxborderw = layer.boxborderw || style.boxborderw || "0";
 
-          const xOffsetNum = (Number(layer.xOffset) || 0);
-          const yOffsetNum = (Number(layer.yOffset) || 0);
+          const xOffsetNum = Number(layer.xOffset) || 0;
+          const yOffsetNum = Number(layer.yOffset) || 0;
           const xExpr = xOffsetNum !== 0 ? `((w-text_w)/2)+${xOffsetNum}` : `(w-text_w)/2`;
           const yExpr = yOffsetNum !== 0 ? `(${pos.y})+${yOffsetNum}` : pos.y;
 
-          return `drawtext=textfile='${txtFile}':fontfile='${fontFile}':fontcolor=${fontcolor}:fontsize=${style.fontsize}:line_spacing=16:borderw=${borderw}:bordercolor=${bordercolor}:shadowx=${shadowx}:shadowy=${shadowy}:shadowcolor=${shadowcolor}:box=${box}:boxcolor=${boxcolor}:boxborderw=${boxborderw}:text_align=C:x='${xExpr}':y='${yExpr}'`;
+          return `drawtext=text='${escapedText}':fontfile='${fontFile}':fontcolor=${fontcolor}:fontsize=${style.fontsize}:line_spacing=16:borderw=${borderw}:bordercolor=${bordercolor}:shadowx=${shadowx}:shadowy=${shadowy}:shadowcolor=${shadowcolor}:box=${box}:boxcolor=${boxcolor}:boxborderw=${boxborderw}:text_align=C:x='${xExpr}':y='${yExpr}'`;
         })
         .join(",");
     } else {
-      filterStr = `drawtext=textfile='${txtFile}':fontfile='${fontFile}':fontcolor=${style.fontcolor}:fontsize=${style.fontsize}:line_spacing=16:borderw=${style.borderw}:bordercolor=${style.bordercolor}:shadowx=${style.shadowx}:shadowy=${style.shadowy}:shadowcolor=${style.shadowcolor}:box=${style.box ? 1 : 0}:boxcolor=${style.boxcolor}:boxborderw=${style.boxborderw}:text_align=C:x=(w-text_w)/2:y='${pos.y}'`;
+      filterStr = `drawtext=text='${escapedText}':fontfile='${fontFile}':fontcolor=${style.fontcolor}:fontsize=${style.fontsize}:line_spacing=16:borderw=${style.borderw}:bordercolor=${style.bordercolor}:shadowx=${style.shadowx}:shadowy=${style.shadowy}:shadowcolor=${style.shadowcolor}:box=${style.box ? 1 : 0}:boxcolor=${style.boxcolor}:boxborderw=${style.boxborderw}:text_align=C:x=(w-text_w)/2:y='${pos.y}'`;
     }
 
     const outPng = path.join(OUTPUT_DIR, `${item.key}.png`);
@@ -63,8 +61,6 @@ function generateSwatches() {
       console.log(` ✅ Đã tạo ảnh swatch: ${item.key}.png`);
     } catch (err) {
       console.error(` ❌ Lỗi tạo swatch ${item.key}: ${err.message}`);
-    } finally {
-      if (fs.existsSync(txtFile)) fs.unlinkSync(txtFile);
     }
   }
 }
