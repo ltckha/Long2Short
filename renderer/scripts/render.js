@@ -53,6 +53,10 @@ const {
   computeXfadeOffsets,
   hasAnyTransitions,
 } = require("./transitions");
+const {
+  syncAnalyticsToSheet,
+  syncProjectToSheet,
+} = require("./googleSheetsSync");
 
 const ROOT = path.resolve(__dirname, "..");
 const WORKSPACE_ROOT = path.resolve(ROOT, "..");
@@ -1533,6 +1537,36 @@ async function renderCurrentProject() {
   }
   writeEffectAnalyticsReport(createEffectAnalytics(advancedEffectsUsed));
   log(`Render completed: project=${videoId} output=${outputPath}`);
+
+  // Đồng bộ Google Sheet khi render thành công
+  try {
+    const videoMeta = timeline.video_meta || {};
+    const captionText = `${videoMeta.description || ""} ${(videoMeta.hashtags || []).map((h) => `#${h}`).join(" ")}`.trim();
+    const effectsUsed = [...new Set(scenes.map((s) => s.advanced_effect?.name).filter(Boolean))].join(", ");
+    const shortDur = scenes.reduce((acc, s) => acc + (Number(s.duration) || 0), 0);
+
+    await syncProjectToSheet({
+      projectId: videoId,
+      status: "🎬 Rendered",
+      inputFile: inputVideo,
+      title: videoMeta.title || "",
+      captionHashtags: captionText,
+      originalDuration: "",
+      shortDuration: `${shortDur.toFixed(1)}s`,
+      sceneCount: scenes.length,
+      hookScore: scenes[0]?.hook_strength || "",
+      effectsSummary: effectsUsed,
+      outputFile: outputPath,
+      createdAt: "",
+      renderedAt: new Date().toISOString().replace("T", " ").substring(0, 16),
+    });
+
+    await syncAnalyticsToSheet();
+    log("[GoogleSheet] Đã đồng bộ trạng thái 🎬 Rendered và Analytics sang Google Sheet & CSV Backup.");
+  } catch (sheetErr) {
+    log(`WARN: Lỗi đồng bộ Google Sheet: ${sheetErr.message}`);
+  }
+
   cleanupTempDir();
   archiveSuccessfulRender(workflow, log);
 }
@@ -1606,6 +1640,24 @@ async function main() {
 }
 
 function handleProjectFailure(error) {
+  try {
+    syncProjectToSheet({
+      projectId: videoId,
+      status: "❌ Failed",
+      inputFile: "",
+      title: "",
+      captionHashtags: "",
+      originalDuration: "",
+      shortDuration: "",
+      sceneCount: "",
+      hookScore: "",
+      effectsSummary: "",
+      outputFile: "",
+      createdAt: "",
+      renderedAt: new Date().toISOString().replace("T", " ").substring(0, 16),
+    });
+  } catch {}
+
   try {
     cleanupTempDir();
     archiveFailedRender(workflow, log);

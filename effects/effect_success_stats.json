@@ -1,7 +1,7 @@
 {
   "_meta": {
     "bootstrapped": true,
-    "last_log_scanned": "/Users/khan/Library/CloudStorage/Nextcloud-ltckha@nc․giayhainancy․vn/Share_Folder/Long2Short/renderer/logs/ai_20260719_142543_render.log",
+    "last_log_scanned": "/Users/khan/Library/CloudStorage/Nextcloud-ltckha@nc․giayhainancy․vn/Share_Folder/Long2Short/renderer/logs/ai_20260720_132341_render.log",
     "rr_index": 0
   },
   "speedup": {
@@ -9,11 +9,11 @@
     "fail": 0
   },
   "zoomsoft": {
-    "success": 36,
+    "success": 37,
     "fail": 0
   },
   "shake": {
-    "success": 44,
+    "success": 45,
     "fail": 0
   },
   "zoomin": {
@@ -21,7 +21,7 @@
     "fail": 0
   },
   "overshootzoom": {
-    "success": 8,
+    "success": 9,
     "fail": 0
   },
   "flash": {

@@ -3,6 +3,7 @@
 const fs = require("fs");
 const path = require("path");
 const { GoogleGenAI } = require("@google/genai");
+const { syncProjectToSheet, syncScenesToSheet } = require("./googleSheetsSync");
 
 const ROOT = path.resolve(__dirname, "..", "..");
 const INCOMING_DIR = path.join(ROOT, "incoming");
@@ -102,6 +103,50 @@ function generateTimestampId() {
   return `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
 }
 
+async function generateContentWithRetryFallback(ai, models, contents, config) {
+  let lastError;
+
+  for (const modelName of models) {
+    console.log(`[AI] Đang thử sử dụng mô hình '${modelName}'...`);
+    const maxRetries = 3;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await ai.models.generateContent({
+          model: modelName,
+          contents,
+          config,
+        });
+        if (response && response.text) {
+          console.log(`[AI] ✅ Mô hình '${modelName}' đã sinh dữ liệu thành công!`);
+          return response;
+        }
+      } catch (err) {
+        lastError = err;
+        const isUnavailable =
+          err.message &&
+          (err.message.includes("503") ||
+            err.message.includes("UNAVAILABLE") ||
+            err.message.includes("high demand") ||
+            err.message.includes("429"));
+
+        if (isUnavailable && attempt < maxRetries) {
+          const waitSec = attempt * 5;
+          console.warn(
+            `[AI] ⚠️ Mô hình '${modelName}' bị quá tải tạm thời (Lần ${attempt}/${maxRetries}). Đợi ${waitSec}s rồi thử lại...`
+          );
+          await new Promise((resolve) => setTimeout(resolve, waitSec * 1000));
+        } else {
+          console.warn(`[AI] ⚠️ Mô hình '${modelName}' không thể hoàn thành: ${err.message}`);
+          break;
+        }
+      }
+    }
+  }
+
+  throw lastError || new Error("Tất cả các mô hình Gemini trong danh sách đều quá tải hoặc thất bại.");
+}
+
 async function main() {
   const videoPathArg = process.argv[2];
   if (!videoPathArg) {
@@ -122,7 +167,8 @@ async function main() {
     process.exit(1);
   }
 
-  const projectId = process.argv[3] || `ai_${generateTimestampId()}`;
+  const defaultProjectId = path.basename(absoluteVideoPath, path.extname(absoluteVideoPath));
+  const projectId = process.argv[3] || defaultProjectId;
   console.log(`[Project] Khởi tạo dự án: ${projectId}`);
 
   const ai = new GoogleGenAI({ apiKey });
@@ -161,24 +207,26 @@ async function main() {
     }
     const systemInstruction = fs.readFileSync(PROMPT_PATH, "utf8");
 
-    console.log("[AI] Đang yêu cầu gemini-3.5-flash phân tích và sinh timeline JSON...");
-    const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: [
+    console.log("[AI] Đang gửi yêu cầu phân tích video sang Gemini AI...");
+    const candidateModels = ["gemini-3.5-flash", "gemini-3.0-flash", "gemini-2.5-flash"];
+    const response = await generateContentWithRetryFallback(
+      ai,
+      candidateModels,
+      [
         {
           fileData: {
             fileUri: fileState.uri,
-            mimeType: fileState.mimeType
-          }
+            mimeType: fileState.mimeType,
+          },
         },
-        "Hãy thực hiện phân tích video trên và trả về kịch bản Timeline JSON chi tiết theo đúng cấu trúc quy chuẩn."
+        "Hãy thực hiện phân tích video trên và trả về kịch bản Timeline JSON chi tiết theo đúng cấu trúc quy chuẩn.",
       ],
-      config: {
+      {
         systemInstruction,
         responseMimeType: "application/json",
         responseSchema: RESPONSE_SCHEMA,
       }
-    });
+    );
 
     const responseText = response.text;
     if (!responseText) {
@@ -206,6 +254,37 @@ async function main() {
     const videoOutputPath = path.join(INCOMING_DIR, `${projectId}.mp4`);
     fs.copyFileSync(absoluteVideoPath, videoOutputPath);
     console.log(`[Video] Đã sao chép video gốc sang: ${videoOutputPath}`);
+
+    // Đồng bộ thông tin kịch bản sang Google Sheet & Local CSV Backup
+    try {
+      const videoMeta = timelineJson.video_meta || {};
+      const scenes = timelineJson.timeline || [];
+      const shortDur = scenes.reduce((acc, s) => acc + (Number(s.duration_s) || 0), 0);
+      const effectsUsed = [...new Set(scenes.map((s) => s.advanced_effect?.name).filter(Boolean))].join(", ");
+
+      const captionText = `${videoMeta.description || ""} ${(videoMeta.hashtags || []).map((h) => `#${h}`).join(" ")}`.trim();
+
+      await syncProjectToSheet({
+        projectId,
+        status: "🤖 Timeline Ready",
+        inputFile: absoluteVideoPath,
+        title: videoMeta.title || "",
+        captionHashtags: captionText,
+        originalDuration: "",
+        shortDuration: `${shortDur.toFixed(1)}s`,
+        sceneCount: scenes.length,
+        hookScore: scenes[0]?.hook_strength || "",
+        effectsSummary: effectsUsed,
+        outputFile: "",
+        createdAt: new Date().toISOString().replace("T", " ").substring(0, 16),
+        renderedAt: "",
+      });
+
+      await syncScenesToSheet(projectId, scenes);
+      console.log("[GoogleSheet] Đã đồng bộ kịch bản mới sang Google Sheet & CSV Backup thành công!");
+    } catch (sheetErr) {
+      console.warn(`[GoogleSheet] WARN: Không thể đồng bộ Google Sheet: ${sheetErr.message}`);
+    }
 
     console.log(`\n🎉 Thành công! Dự án '${projectId}' đã sẵn sàng để render.`);
     console.log(`Chạy lệnh: node renderer/scripts/render.js ${projectId}`);
