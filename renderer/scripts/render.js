@@ -336,7 +336,19 @@ function getEffectName(effect) {
   return "none";
 }
 
-function normalizeScenes(timeline) {
+function getInputVideoDuration(inputVideoPath) {
+  if (!inputVideoPath || !fs.existsSync(inputVideoPath)) return null;
+  try {
+    const cmd = `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${inputVideoPath}"`;
+    const out = execSync(cmd, { encoding: "utf8" }).trim();
+    const dur = parseFloat(out);
+    return Number.isFinite(dur) && dur > 0 ? dur : null;
+  } catch {
+    return null;
+  }
+}
+
+function normalizeScenes(timeline, inputVideoPath) {
   const normalizedTimeline = normalizeTimeline(timeline);
   const rawScenes = Array.isArray(normalizedTimeline) ? normalizedTimeline : normalizedTimeline.scenes;
   const includedScenes = Array.isArray(rawScenes)
@@ -347,13 +359,24 @@ function normalizeScenes(timeline) {
     fail(`Timeline phải có mảng scenes không rỗng: ${timelinePath}`);
   }
 
+  const maxVideoDuration = getInputVideoDuration(inputVideoPath);
+
   return includedScenes.map((scene, index) => {
-    const start = timeToSeconds(scene.start ?? scene.from ?? scene.in);
-    const endValue = scene.end ?? scene.to ?? scene.out;
-    const durationValue = scene.duration ?? scene.length;
-    const end =
+    let start = timeToSeconds(scene.start ?? scene.from ?? scene.in);
+    let endValue = scene.end ?? scene.to ?? scene.out;
+    let durationValue = scene.duration ?? scene.length;
+    let end =
       endValue !== undefined ? timeToSeconds(endValue) : start + timeToSeconds(durationValue);
-    const sourceDuration = end - start;
+    let sourceDuration = end - start;
+
+    if (maxVideoDuration && start >= maxVideoDuration - 0.5) {
+      const safeSourceDur = Math.min(Math.max(1, sourceDuration), maxVideoDuration * 0.2);
+      start = Math.max(0, maxVideoDuration - safeSourceDur - 0.2);
+      end = start + safeSourceDur;
+      sourceDuration = end - start;
+      log(`[SafetyClamp] Scene ${index + 1} (${scene.scene_id || index}) có start=${scene.start}s vượt quá thời lượng video gốc (${maxVideoDuration.toFixed(2)}s). Tự động điều chỉnh start=${start.toFixed(2)}s end=${end.toFixed(2)}s`);
+    }
+
     const targetDuration =
       durationValue !== undefined ? timeToSeconds(durationValue) : sourceDuration;
     const duration = targetDuration;
@@ -1498,7 +1521,7 @@ async function renderCurrentProject() {
 
   const timeline = normalizeTimeline(loadTimeline(timelinePath));
   const inputVideo = resolveInputVideo(timeline);
-  const scenes = buildRenderScenes(normalizeScenes(timeline));
+  const scenes = buildRenderScenes(normalizeScenes(timeline, inputVideo));
   const outputPath = resolveOutputPath(timeline);
   workflow.timeline = timeline;
   workflow.inputVideo = inputVideo;
