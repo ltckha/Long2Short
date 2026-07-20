@@ -6,7 +6,35 @@ const BACKUP_DIR = path.join(ROOT, "renderer", "output", "sheets_backup");
 const STATS_PATH = path.join(ROOT, "effects", "effect_success_stats.json");
 
 function getWebhookUrl() {
-  return process.env.GOOGLE_SHEET_WEBHOOK_URL || "";
+  if (process.env.GOOGLE_SHEET_WEBHOOK_URL) {
+    return process.env.GOOGLE_SHEET_WEBHOOK_URL.trim();
+  }
+
+  // Thử đọc từ config local env.json
+  const configPath = path.join(ROOT, "renderer", "config", "env.json");
+  if (fs.existsSync(configPath)) {
+    try {
+      const conf = JSON.parse(fs.readFileSync(configPath, "utf8"));
+      if (conf.GOOGLE_SHEET_WEBHOOK_URL) return conf.GOOGLE_SHEET_WEBHOOK_URL.trim();
+    } catch {}
+  }
+
+  // Thử đọc từ ~/.zshrc hoặc ~/.bash_profile
+  const homeDir = process.env.HOME || "/Users/khan";
+  const shellFiles = [path.join(homeDir, ".zshrc"), path.join(homeDir, ".bash_profile")];
+  for (const sf of shellFiles) {
+    if (fs.existsSync(sf)) {
+      try {
+        const content = fs.readFileSync(sf, "utf8");
+        const match = content.match(/GOOGLE_SHEET_WEBHOOK_URL=["']?([^"'\r\n]+)["']?/);
+        if (match && match[1]) {
+          return match[1].trim();
+        }
+      } catch {}
+    }
+  }
+
+  return "";
 }
 
 async function sendWebhook(payload) {
