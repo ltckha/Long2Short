@@ -5,6 +5,12 @@ const ROOT = path.resolve(__dirname, "..", "..");
 const BACKUP_DIR = path.join(ROOT, "renderer", "output", "sheets_backup");
 const STATS_PATH = path.join(ROOT, "effects", "effect_success_stats.json");
 
+function getLocalDateTime() {
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+}
+
 function getWebhookUrl() {
   if (process.env.GOOGLE_SHEET_WEBHOOK_URL) {
     return process.env.GOOGLE_SHEET_WEBHOOK_URL.trim();
@@ -183,6 +189,7 @@ async function syncAnalyticsToSheet() {
 }
 
 module.exports = {
+  getLocalDateTime,
   syncAnalyticsToSheet,
   syncProjectToSheet,
   syncScenesToSheet,

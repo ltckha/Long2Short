@@ -3,7 +3,7 @@
 const fs = require("fs");
 const path = require("path");
 const { GoogleGenAI } = require("@google/genai");
-const { syncProjectToSheet, syncScenesToSheet } = require("./googleSheetsSync");
+const { getLocalDateTime, syncProjectToSheet, syncScenesToSheet } = require("./googleSheetsSync");
 
 const ROOT = path.resolve(__dirname, "..", "..");
 const INCOMING_DIR = path.join(ROOT, "incoming");
@@ -351,7 +351,7 @@ async function main() {
         hookScore: scenes[0]?.hook_strength || "",
         effectsSummary: effectsUsed,
         outputFile: "",
-        createdAt: new Date().toISOString().replace("T", " ").substring(0, 16),
+        createdAt: getLocalDateTime(),
         renderedAt: "",
       });
 

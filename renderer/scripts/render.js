@@ -54,6 +54,7 @@ const {
   hasAnyTransitions,
 } = require("./transitions");
 const {
+  getLocalDateTime,
   syncAnalyticsToSheet,
   syncProjectToSheet,
 } = require("./googleSheetsSync");
@@ -563,6 +564,7 @@ function createOpeningHookScene(sourceScene, duration) {
     id: `opening_hook_${safeName(sourceScene.id)}`,
     sourceSceneId: sourceScene.id,
     openingHook: true,
+    subtitle_style: "hook_bold",
     start: sourceScene.start + startOffset,
     end: sourceScene.start + startOffset + duration,
     duration,
@@ -1581,7 +1583,7 @@ async function renderCurrentProject() {
       effectsSummary: effectsUsed,
       outputFile: outputPath,
       createdAt: "",
-      renderedAt: new Date().toISOString().replace("T", " ").substring(0, 16),
+      renderedAt: getLocalDateTime(),
     });
 
     await syncAnalyticsToSheet();
@@ -1677,7 +1679,7 @@ function handleProjectFailure(error) {
       effectsSummary: "",
       outputFile: "",
       createdAt: "",
-      renderedAt: new Date().toISOString().replace("T", " ").substring(0, 16),
+      renderedAt: getLocalDateTime(),
     });
   } catch {}
 
