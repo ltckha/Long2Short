@@ -1,7 +1,7 @@
 function normalizePosition(value) {
-  const key = String(value || "bottom").toLowerCase().replace(/[^a-z0-9]+/g, "");
+  const key = String(value || "top").toLowerCase().replace(/[^a-z0-9]+/g, "");
   if (["top", "center", "bottom"].includes(key)) return key;
-  return "bottom";
+  return "top";
 }
 
 function getSubtitlePosition(position, subtitleSafeArea) {
