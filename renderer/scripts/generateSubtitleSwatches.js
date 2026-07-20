@@ -20,7 +20,7 @@ function generateSwatches() {
   console.log("🎨 Đang sinh bộ ảnh mẫu Preview cho các Subtitle Style...");
 
   for (const item of STYLES_TO_PREVIEW) {
-    const style = resolveSubtitleStyle(item.key);
+    const style = resolveSubtitleStyle({ subtitle_style: item.key });
     const safeArea = { topRatio: 0.15, centerRatio: 0.46, bottomRatio: 0.13 };
     const pos = getSubtitlePosition("top", safeArea);
 
