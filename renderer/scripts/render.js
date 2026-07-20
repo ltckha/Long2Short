@@ -1573,7 +1573,7 @@ async function renderCurrentProject() {
     await syncProjectToSheet({
       projectId: videoId,
       status: "🎬 Rendered",
-      inputFile: inputVideo,
+      inputFile: "",
       title: videoMeta.title || "",
       captionHashtags: captionText,
       originalDuration: "",

@@ -5,15 +5,15 @@
     "rr_index": 0
   },
   "speedup": {
-    "success": 29,
+    "success": 30,
     "fail": 0
   },
   "zoomsoft": {
-    "success": 39,
+    "success": 40,
     "fail": 0
   },
   "shake": {
-    "success": 47,
+    "success": 48,
     "fail": 0
   },
   "zoomin": {
@@ -21,7 +21,7 @@
     "fail": 0
   },
   "overshootzoom": {
-    "success": 11,
+    "success": 12,
     "fail": 0
   },
   "flash": {
