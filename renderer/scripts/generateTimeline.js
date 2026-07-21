@@ -292,7 +292,7 @@ async function main() {
   const systemInstruction = fs.readFileSync(promptPath, "utf8");
 
     console.log("[AI] Đang gửi yêu cầu phân tích video sang Gemini AI...");
-    const candidateModels = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-3.0-flash", "gemini-3.5-flash"];
+    const candidateModels = ["gemini-3.5-flash", "gemini-3.0-flash", "gemini-2.5-flash", "gemini-2.0-flash"];
     const response = await generateContentWithRetryFallback(
       ai,
       candidateModels,
