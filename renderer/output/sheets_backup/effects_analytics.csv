@@ -1,9 +1,9 @@
 Effect Key,Success Count,Fail Count,Success Rate (%),Safe Pool Status
-"speedup","29","0","100.0%","Safe"
-"zoomsoft","39","0","100.0%","Safe"
-"shake","47","0","100.0%","Safe"
+"speedup","30","0","100.0%","Safe"
+"zoomsoft","40","0","100.0%","Safe"
+"shake","48","0","100.0%","Safe"
 "zoomin","31","0","100.0%","Safe"
-"overshootzoom","11","0","100.0%","Safe"
+"overshootzoom","12","0","100.0%","Safe"
 "flash","28","0","100.0%","Safe"
 "speedrampfast","6","0","100.0%","Safe"
 "driftcam","1","0","100.0%","Restricted"

@@ -1243,6 +1243,23 @@ async function renderScene(inputVideo, scene) {
   return outputPath;
 }
 
+function buildAudioSpeedFilter(speedRatio) {
+  let speed = speedRatio;
+  const filters = [];
+  while (speed > 2.0) {
+    filters.push("atempo=2.0");
+    speed /= 2.0;
+  }
+  while (speed < 0.5) {
+    filters.push("atempo=0.5");
+    speed /= 0.5;
+  }
+  if (Math.abs(speed - 1.0) > 0.01) {
+    filters.push(`atempo=${speed.toFixed(3)}`);
+  }
+  return filters.length > 0 ? filters.join(",") : "anull";
+}
+
 async function renderTemporalWarpScene(inputVideo, scene, voiceWav = null) {
   const outputPath = sceneOutputPath(scene);
   const segments = buildTemporalSegments(scene);
@@ -1252,6 +1269,8 @@ async function renderTemporalWarpScene(inputVideo, scene, voiceWav = null) {
     log(`WARN: Temporal warp không tạo được segment cho ${scene.id}, render scene thường.`);
     return renderScene(inputVideo, { ...scene, keyMoments: [], sourceDuration: scene.duration });
   }
+
+  const hasOrigAudio = voiceWav ? false : hasAudioStream(inputVideo);
 
   const buildArgs = (s) => {
     if (voiceWav) {
@@ -1295,8 +1314,49 @@ async function renderTemporalWarpScene(inputVideo, scene, voiceWav = null) {
         "+faststart",
         outputPath,
       ];
+    } else if (hasOrigAudio) {
+      // Trường hợp 2: Giữ lại âm thanh gốc của video và đồng bộ tốc độ mượt mà bằng atempo
+      const speedRatio = (s.sourceDuration || s.duration) / s.duration;
+      const audioFilter = buildAudioSpeedFilter(speedRatio);
+      return [
+        "-hide_banner",
+        "-y",
+        "-ss",
+        s.start.toFixed(3),
+        "-i",
+        inputVideo,
+        "-t",
+        (s.sourceDuration || s.duration).toFixed(3),
+        "-filter_complex",
+        `${buildTemporalWarpFilterComplex(s, segments)};[0:a]${audioFilter},aresample=44100,asetpts=PTS-STARTPTS[aout_orig]`,
+        "-map",
+        "[vout]",
+        "-map",
+        "[aout_orig]",
+        "-t",
+        s.duration.toFixed(3),
+        "-c:v",
+        "libx264",
+        "-preset",
+        "veryfast",
+        "-crf",
+        "20",
+        "-r",
+        String(TARGET.fps),
+        "-c:a",
+        "aac",
+        "-b:a",
+        "160k",
+        "-ac",
+        "2",
+        "-ar",
+        "44100",
+        "-movflags",
+        "+faststart",
+        outputPath,
+      ];
     } else {
-      // Trường hợp 2: Không có WAV — dùng silent audio (anullsrc)
+      // Trường hợp 3: Không có WAV và video gốc không có audio — chèn silent audio
       return [
         "-hide_banner",
         "-y",
@@ -1332,8 +1392,6 @@ async function renderTemporalWarpScene(inputVideo, scene, voiceWav = null) {
         "2",
         "-ar",
         "44100",
-        "-movflags",
-        "+faststart",
         outputPath,
       ];
     }

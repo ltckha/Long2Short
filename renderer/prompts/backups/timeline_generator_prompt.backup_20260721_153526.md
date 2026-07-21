@@ -89,23 +89,3 @@ OUTPUT JSON SCHEMA
     }
   ]
 }
-
-<!-- ENUM_VALID_VALUES:START -->
-
-## GIÁ TRỊ HỢP LỆ CHO CÁC TRƯỜNG ADVANCED_EFFECT
-
-Bắt buộc chỉ sử dụng các giá trị dưới đây. Mọi giá trị ngoài danh sách sẽ bị hệ thống render từ chối:
-
-**advanced_effect.intent**: `viral_fast`, `reveal_impact`, `premium_showcase`, `luxury_soft`, `dramatic_focus`, `satisfying_cut`, `energetic_demo`, `cinematic_transition`, `tension_build`, `emotional_pause`
-
-**advanced_effect.mood**: `aggressive`, `premium`, `energetic`, `satisfying`, `playful`, `emotional`, `dramatic`, `soft`
-
-**advanced_effect.pacing**: `slow`, `medium`, `fast`, `pulse`, `dynamic`
-
-**advanced_effect.focus**: `product`, `texture`, `packaging`, `reveal`, `hand_action`, `logo`
-
-**advanced_effect.camera_motion**: `static`, `push_in`, `push_out`, `drift`, `snap`, `overshoot`, `pulse`
-
-**transition_out.type**: `fade`, `wipe_left`, `wipe_right`, `slide_up`, `circle_open`, `pixelize`
-
-<!-- ENUM_VALID_VALUES:END -->

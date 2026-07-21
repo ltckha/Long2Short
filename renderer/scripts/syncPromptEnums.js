@@ -16,7 +16,10 @@ const path = require("path");
 
 const ROOT = path.resolve(__dirname, "..", "..");
 const ENUMS_PATH = path.join(ROOT, "renderer", "config", "effectEnums.json");
-const PROMPT_PATH = path.join(ROOT, "renderer", "prompts", "timeline_generator_prompt.md");
+const PROMPT_PATHS = [
+  path.join(ROOT, "renderer", "prompts", "long2short_generator_prompt.md"),
+  path.join(ROOT, "renderer", "prompts", "short2short_generator_prompt.md"),
+];
 
 const SECTION_START = "<!-- ENUM_VALID_VALUES:START -->";
 const SECTION_END = "<!-- ENUM_VALID_VALUES:END -->";
@@ -95,35 +98,34 @@ function main() {
     console.error(`[ERROR] Không tìm thấy file enum: ${ENUMS_PATH}`);
     process.exit(1);
   }
-  if (!fs.existsSync(PROMPT_PATH)) {
-    console.error(`[ERROR] Không tìm thấy file prompt: ${PROMPT_PATH}`);
-    process.exit(1);
-  }
 
   const enums = JSON.parse(fs.readFileSync(ENUMS_PATH, "utf8"));
-  let prompt = fs.readFileSync(PROMPT_PATH, "utf8");
-
   const newSection = buildEnumSection(enums);
 
-  if (prompt.includes(SECTION_START) && prompt.includes(SECTION_END)) {
-    // Thay thế section hiện có
-    const startIdx = prompt.indexOf(SECTION_START);
-    const endIdx = prompt.indexOf(SECTION_END) + SECTION_END.length;
-    const before = prompt.slice(0, startIdx).trimEnd();
-    const after = prompt.slice(endIdx).trimStart();
-    prompt = `${before}\n${newSection}\n${after}`;
-    console.log("[sync-prompt] Đã cập nhật section ENUM_VALID_VALUES trong prompt.");
-  } else {
-    // Lần đầu: append vào cuối file
-    prompt = `${prompt.trimEnd()}\n${newSection}\n`;
-    console.log("[sync-prompt] Đã thêm section ENUM_VALID_VALUES vào cuối prompt.");
+  for (const promptPath of PROMPT_PATHS) {
+    if (!fs.existsSync(promptPath)) {
+      console.warn(`[sync-prompt] WARN: Bỏ qua file prompt không tồn tại: ${promptPath}`);
+      continue;
+    }
+
+    let prompt = fs.readFileSync(promptPath, "utf8");
+
+    if (prompt.includes(SECTION_START) && prompt.includes(SECTION_END)) {
+      const startIdx = prompt.indexOf(SECTION_START);
+      const endIdx = prompt.indexOf(SECTION_END) + SECTION_END.length;
+      const before = prompt.slice(0, startIdx).trimEnd();
+      const after = prompt.slice(endIdx).trimStart();
+      prompt = `${before}\n${newSection}\n${after}`;
+      console.log(`[sync-prompt] Đã cập nhật section ENUM_VALID_VALUES trong: ${path.basename(promptPath)}`);
+    } else {
+      prompt = `${prompt.trimEnd()}\n${newSection}\n`;
+      console.log(`[sync-prompt] Đã thêm section ENUM_VALID_VALUES vào cuối: ${path.basename(promptPath)}`);
+    }
+
+    backupPromptFile(promptPath);
+    fs.writeFileSync(promptPath, prompt, "utf8");
   }
 
-  backupPromptFile(PROMPT_PATH);
-  fs.writeFileSync(PROMPT_PATH, prompt, "utf8");
-
-  console.log("[sync-prompt] ✅ Hoàn tất. File đã được cập nhật:");
-  console.log(`   ${PROMPT_PATH}`);
   console.log("");
   console.log("[sync-prompt] Enum hiện tại:");
   for (const [key, values] of Object.entries(enums)) {

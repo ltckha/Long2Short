@@ -282,7 +282,7 @@ async function main() {
   }
   const isShort2Short = mode === "short2short";
   const pipelineMode = isShort2Short ? "Short2Short" : "Long2Short";
-  const promptFileName = isShort2Short ? "short2short_generator_prompt.md" : "timeline_generator_prompt.md";
+  const promptFileName = isShort2Short ? "short2short_generator_prompt.md" : "long2short_generator_prompt.md";
   const promptPath = path.join(PROMPTS_DIR, promptFileName);
 
   console.log(`[Mode] Chế độ chạy: ${pipelineMode} (Prompt: ${promptFileName})`);
