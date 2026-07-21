@@ -1,6 +1,6 @@
 /**
  * ==============================================================================
- * GOOGLE APPS SCRIPT: LONG2SHORT AUTOMATIC DASHBOARD
+ * GOOGLE APPS SCRIPT: AUTO-VIDEO-FACTORY AUTOMATIC DASHBOARD
  * ==============================================================================
  * HƯỚNG DẪN SỬ DỤNG:
  * 1. Mở file Google Sheet của bạn trên trình duyệt.
