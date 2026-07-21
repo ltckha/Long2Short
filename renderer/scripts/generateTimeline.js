@@ -103,27 +103,18 @@ function generateTimestampId() {
   return `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
 }
 
-async function generateContentWithRetryFallback(ai, models, contents, config, timeoutMs = 30000) {
+async function generateContentWithRetryFallback(ai, models, contents, config) {
   let lastError;
 
   for (const modelName of models) {
-    console.log(`[AI] Đang thử sử dụng mô hình '${modelName}' (Giới hạn chờ ${timeoutMs / 1000}s)...`);
+    console.log(`[AI] Đang thử sử dụng mô hình '${modelName}'...`);
 
     try {
-      const apiCall = ai.models.generateContent({
+      const response = await ai.models.generateContent({
         model: modelName,
         contents,
         config,
       });
-
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(
-          () => reject(new Error(`TIMEOUT: Mô hình '${modelName}' bị treo không phản hồi quá ${timeoutMs / 1000}s.`)),
-          timeoutMs
-        )
-      );
-
-      const response = await Promise.race([apiCall, timeoutPromise]);
 
       if (response && response.text) {
         console.log(`[AI] ✅ Mô hình '${modelName}' đã sinh dữ liệu thành công!`);
@@ -131,7 +122,18 @@ async function generateContentWithRetryFallback(ai, models, contents, config, ti
       }
     } catch (err) {
       lastError = err;
-      console.warn(`[AI] ⚠️ Mô hình '${modelName}' không phản hồi/lỗi: ${err.message}. Chuyển sang mô hình dự phòng kế tiếp...`);
+      const isUnavailable =
+        err.message &&
+        (err.message.includes("503") ||
+          err.message.includes("UNAVAILABLE") ||
+          err.message.includes("high demand") ||
+          err.message.includes("429"));
+
+      if (isUnavailable) {
+        console.warn(`[AI] ⚠️ Mô hình '${modelName}' bị báo quá tải (503/429). Chuyển sang mô hình dự phòng kế tiếp...`);
+      } else {
+        console.warn(`[AI] ⚠️ Mô hình '${modelName}' gặp lỗi: ${err.message}. Thử mô hình kế tiếp...`);
+      }
     }
   }
 
