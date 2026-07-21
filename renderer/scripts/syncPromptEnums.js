@@ -66,15 +66,17 @@ function backupPromptFile(promptPath) {
     const pad = (n) => String(n).padStart(2, "0");
     const timestamp = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
 
-    const backupName = `timeline_generator_prompt.backup_${timestamp}.md`;
+    const baseName = path.basename(promptPath, ".md");
+    const backupName = `${baseName}.backup_${timestamp}.md`;
     const backupPath = path.join(BACKUP_DIR, backupName);
 
     fs.copyFileSync(promptPath, backupPath);
-    console.log(`[sync-prompt] Đã tạo bản backup: ${backupPath}`);
+    console.log(`[sync-prompt] Đã tạo bản backup riêng cho ${baseName}: ${backupName}`);
 
+    // Giữ tối đa 10 bản backup mới nhất cho riêng từng loại prompt
     const files = fs
       .readdirSync(BACKUP_DIR)
-      .filter((f) => f.startsWith("timeline_generator_prompt.backup_") && f.endsWith(".md"))
+      .filter((f) => f.startsWith(`${baseName}.backup_`) && f.endsWith(".md"))
       .map((f) => {
         const filePath = path.join(BACKUP_DIR, f);
         return { name: f, path: filePath, mtime: fs.statSync(filePath).mtimeMs };
@@ -85,7 +87,7 @@ function backupPromptFile(promptPath) {
       const toDeleteCount = files.length - 10;
       for (let i = 0; i < toDeleteCount; i++) {
         fs.unlinkSync(files[i].path);
-        console.log(`[sync-prompt] Đã tự động xóa bản backup cũ: ${files[i].name}`);
+        console.log(`[sync-prompt] Đã tự động dọn dẹp bản backup cũ: ${files[i].name}`);
       }
     }
   } catch (err) {

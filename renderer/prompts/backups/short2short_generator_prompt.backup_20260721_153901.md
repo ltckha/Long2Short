@@ -52,6 +52,14 @@ TEXT POSITIONING & STYLE RULES
   - `cta_red`: Chữ màu đỏ tươi rực rỡ nhấn mạnh lời kêu gọi hành động ở cuối video.
 
 ━━━━━━━━━━━━━━━━━━
+TRANSITION OUT RULES (CHUYỂN CẢNH KỊCH TÍNH ĐA DẠNG)
+━━━━━━━━━━━━━━━━━━
+- `transition_out`: Cấu hình chuyển cảnh nghệ thuật sang scene tiếp theo (cảnh cuối cùng của video đặt trường này là `null`).
+  - `type`: Tên loại transition (Chỉ chọn 1 trong: `fade`, `wipe_left`, `wipe_right`, `slide_up`, `circle_open`, `pixelize`).
+  - `duration`: Thời lượng chuyển cảnh bằng số thực (thường trong khoảng `0.2` đến `0.5` giây).
+  - **BẮT BUỘC ĐA DẠNG:** Lựa chọn thay đổi linh hoạt các loại chuyển cảnh khác nhau giữa các scene (ví dụ scene 1 dùng `wipe_left`, scene 2 dùng `slide_up`, scene 3 dùng `circle_open`...) để tạo sự biến hóa thị giác kịch tính. CẤM dùng duy nhất 1 loại transition cho toàn bộ các scene.
+
+━━━━━━━━━━━━━━━━━━
 OUTPUT JSON SCHEMA
 ━━━━━━━━━━━━━━━━━━
 {
@@ -89,3 +97,23 @@ OUTPUT JSON SCHEMA
     }
   ]
 }
+
+<!-- ENUM_VALID_VALUES:START -->
+
+## GIÁ TRỊ HỢP LỆ CHO CÁC TRƯỜNG ADVANCED_EFFECT
+
+Bắt buộc chỉ sử dụng các giá trị dưới đây. Mọi giá trị ngoài danh sách sẽ bị hệ thống render từ chối:
+
+**advanced_effect.intent**: `viral_fast`, `reveal_impact`, `premium_showcase`, `luxury_soft`, `dramatic_focus`, `satisfying_cut`, `energetic_demo`, `cinematic_transition`, `tension_build`, `emotional_pause`
+
+**advanced_effect.mood**: `aggressive`, `premium`, `energetic`, `satisfying`, `playful`, `emotional`, `dramatic`, `soft`
+
+**advanced_effect.pacing**: `slow`, `medium`, `fast`, `pulse`, `dynamic`
+
+**advanced_effect.focus**: `product`, `texture`, `packaging`, `reveal`, `hand_action`, `logo`
+
+**advanced_effect.camera_motion**: `static`, `push_in`, `push_out`, `drift`, `snap`, `overshoot`, `pulse`
+
+**transition_out.type**: `fade`, `wipe_left`, `wipe_right`, `slide_up`, `circle_open`, `pixelize`
+
+<!-- ENUM_VALID_VALUES:END -->
