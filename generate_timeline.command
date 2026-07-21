@@ -24,6 +24,21 @@ if [ -z "$GEMINI_API_KEY" ]; then
     export GEMINI_API_KEY="$INPUT_KEY"
 fi
 
+echo "🎯 Chọn Chế độ Xử lý Video (Pipeline Mode):"
+echo "   [1] Long2Short  : Cắt lọc phân cảnh đắt giá từ Video Dài (> 90s)"
+echo "   [2] Short2Short : Tái cấu trúc, đổi voice & hiệu ứng cho Video Ngắn (15s-90s)"
+echo ""
+read -p "Nhập lựa chọn của bạn [Mặc định 1]: " MODE_CHOICE
+
+MODE_FLAG="--mode=long2short"
+if [ "$MODE_CHOICE" = "2" ]; then
+    MODE_FLAG="--mode=short2short"
+    echo "👉 Đã chọn Chế độ: SHORT2SHORT"
+else
+    echo "👉 Đã chọn Chế độ: LONG2SHORT"
+fi
+
+echo ""
 echo "👉 Kéo thả file video (.mp4) bạn muốn phân tích vào cửa sổ này,"
 echo "   sau đó nhấn [ENTER] để bắt đầu:"
 echo ""
@@ -41,9 +56,9 @@ if [ -z "$VIDEO_PATH" ] || [ ! -f "$VIDEO_PATH" ]; then
 fi
 
 echo ""
-echo "🚀 Đang khởi chạy Gemini AI phân tích video..."
+echo "🚀 Đang khởi chạy Gemini AI phân tích video ($MODE_FLAG)..."
 echo "--------------------------------------------------"
-node renderer/scripts/generateTimeline.js "$VIDEO_PATH"
+node renderer/scripts/generateTimeline.js "$VIDEO_PATH" "" "$MODE_FLAG"
 echo "--------------------------------------------------"
 
 echo ""

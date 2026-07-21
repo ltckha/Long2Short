@@ -88,12 +88,13 @@ async function syncProjectToSheet(projectData) {
   // 2. Local CSV Backup
   const csvPath = path.join(BACKUP_DIR, "projects_tracker.csv");
   const headers = [
-    "Project ID", "Status", "Input File", "Video Title", "Caption & Hashtags",
+    "Project ID", "Pipeline Mode", "Status", "Input File", "Video Title", "Caption & Hashtags",
     "Original Duration", "Short Duration", "Scene Count", "Opening Hook Score",
     "Effects Summary", "Output File", "Created At", "Rendered At"
   ];
   const row = [
     projectData.projectId,
+    projectData.pipelineMode || "Long2Short",
     projectData.status,
     projectData.inputFile,
     projectData.title,

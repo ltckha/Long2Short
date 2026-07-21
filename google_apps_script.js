@@ -46,7 +46,7 @@ function ensureSheetsAndHeaders(ss) {
   if (!sheetTracker) {
     sheetTracker = ss.insertSheet("PROJECTS_TRACKER");
     const headers = [
-      "Project ID", "Status", "Input File", "Video Title", "Caption & Hashtags",
+      "Project ID", "Pipeline Mode", "Status", "Input File", "Video Title", "Caption & Hashtags",
       "Original Duration", "Short Duration", "Scene Count", "Opening Hook Score",
       "Effects Summary", "Output File", "Created At", "Rendered At"
     ];
@@ -105,6 +105,7 @@ function updateProjectTracker(ss, p) {
 
   const rowValues = [
     p.projectId,
+    p.pipelineMode || "Long2Short",
     p.status || "",
     p.inputFile || "",
     p.title || "",

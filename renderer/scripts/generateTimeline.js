@@ -274,10 +274,23 @@ async function main() {
     }
     console.log("[Poll] Video đã sẵn sàng hoạt động!");
 
-    if (!fs.existsSync(PROMPT_PATH)) {
-      throw new Error(`Không tìm thấy file prompt system tại: ${PROMPT_PATH}`);
-    }
-    const systemInstruction = fs.readFileSync(PROMPT_PATH, "utf8");
+  // Phân tích tham số mode: node generateTimeline.js <path_to_video> [project_id] [--mode=short2short|long2short]
+  let mode = "long2short";
+  const modeArg = process.argv.find((arg) => arg.startsWith("--mode="));
+  if (modeArg) {
+    mode = modeArg.split("=")[1].toLowerCase().trim();
+  }
+  const isShort2Short = mode === "short2short";
+  const pipelineMode = isShort2Short ? "Short2Short" : "Long2Short";
+  const promptFileName = isShort2Short ? "short2short_generator_prompt.md" : "timeline_generator_prompt.md";
+  const promptPath = path.join(PROMPTS_DIR, promptFileName);
+
+  console.log(`[Mode] Chế độ chạy: ${pipelineMode} (Prompt: ${promptFileName})`);
+
+  if (!fs.existsSync(promptPath)) {
+    throw new Error(`Không tìm thấy file prompt system tại: ${promptPath}`);
+  }
+  const systemInstruction = fs.readFileSync(promptPath, "utf8");
 
     console.log("[AI] Đang gửi yêu cầu phân tích video sang Gemini AI...");
     const candidateModels = ["gemini-3.5-flash", "gemini-3.0-flash", "gemini-2.5-flash"];
@@ -320,6 +333,10 @@ async function main() {
     // Đảm bảo thư mục incoming tồn tại
     fs.mkdirSync(INCOMING_DIR, { recursive: true });
 
+    // Gán thuộc tính pipeline_mode vào video_meta
+    timelineJson.video_meta = timelineJson.video_meta || {};
+    timelineJson.video_meta.pipeline_mode = pipelineMode;
+
     // Ghi file JSON timeline
     const timelineOutputPath = path.join(INCOMING_DIR, `${projectId}.json`);
     fs.writeFileSync(timelineOutputPath, JSON.stringify(timelineJson, null, 2), "utf8");
@@ -341,6 +358,7 @@ async function main() {
 
       await syncProjectToSheet({
         projectId,
+        pipelineMode,
         status: "🤖 Timeline Ready",
         inputFile: absoluteVideoPath,
         title: videoMeta.title || "",
