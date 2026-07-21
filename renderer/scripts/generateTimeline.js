@@ -255,8 +255,8 @@ async function main() {
     let attempts = 0;
     while (fileState.state === "PROCESSING") {
       attempts++;
-      console.log(`[Poll] (#${attempts}) File đang được xử lý, đợi 2s...`);
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      console.log(`[Poll] (#${attempts}) File đang được xử lý, đợi 5s...`);
+      await new Promise((resolve) => setTimeout(resolve, 5000));
       fileState = await ai.files.get({ name: uploadResult.name });
     }
 
