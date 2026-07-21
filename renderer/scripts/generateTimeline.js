@@ -103,43 +103,35 @@ function generateTimestampId() {
   return `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
 }
 
-async function generateContentWithRetryFallback(ai, models, contents, config) {
+async function generateContentWithRetryFallback(ai, models, contents, config, timeoutMs = 30000) {
   let lastError;
 
   for (const modelName of models) {
-    console.log(`[AI] Đang thử sử dụng mô hình '${modelName}'...`);
-    const maxRetries = 3;
+    console.log(`[AI] Đang thử sử dụng mô hình '${modelName}' (Giới hạn chờ ${timeoutMs / 1000}s)...`);
 
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        const response = await ai.models.generateContent({
-          model: modelName,
-          contents,
-          config,
-        });
-        if (response && response.text) {
-          console.log(`[AI] ✅ Mô hình '${modelName}' đã sinh dữ liệu thành công!`);
-          return response;
-        }
-      } catch (err) {
-        lastError = err;
-        const isUnavailable =
-          err.message &&
-          (err.message.includes("503") ||
-            err.message.includes("UNAVAILABLE") ||
-            err.message.includes("high demand") ||
-            err.message.includes("429"));
+    try {
+      const apiCall = ai.models.generateContent({
+        model: modelName,
+        contents,
+        config,
+      });
 
-        if (isUnavailable) {
-          console.warn(
-            `[AI] ⚠️ Mô hình '${modelName}' bị quá tải (503/429). Chuyển sang mô hình dự phòng kế tiếp ngay lập tức...`
-          );
-          break;
-        } else {
-          console.warn(`[AI] ⚠️ Mô hình '${modelName}' không thể hoàn thành: ${err.message}`);
-          break;
-        }
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error(`TIMEOUT: Mô hình '${modelName}' bị treo không phản hồi quá ${timeoutMs / 1000}s.`)),
+          timeoutMs
+        )
+      );
+
+      const response = await Promise.race([apiCall, timeoutPromise]);
+
+      if (response && response.text) {
+        console.log(`[AI] ✅ Mô hình '${modelName}' đã sinh dữ liệu thành công!`);
+        return response;
       }
+    } catch (err) {
+      lastError = err;
+      console.warn(`[AI] ⚠️ Mô hình '${modelName}' không phản hồi/lỗi: ${err.message}. Chuyển sang mô hình dự phòng kế tiếp...`);
     }
   }
 
