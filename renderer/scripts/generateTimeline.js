@@ -130,12 +130,11 @@ async function generateContentWithRetryFallback(ai, models, contents, config) {
             err.message.includes("high demand") ||
             err.message.includes("429"));
 
-        if (isUnavailable && attempt < maxRetries) {
-          const waitSec = attempt * 5;
+        if (isUnavailable) {
           console.warn(
-            `[AI] ⚠️ Mô hình '${modelName}' bị quá tải tạm thời (Lần ${attempt}/${maxRetries}). Đợi ${waitSec}s rồi thử lại...`
+            `[AI] ⚠️ Mô hình '${modelName}' bị quá tải (503/429). Chuyển sang mô hình dự phòng kế tiếp ngay lập tức...`
           );
-          await new Promise((resolve) => setTimeout(resolve, waitSec * 1000));
+          break;
         } else {
           console.warn(`[AI] ⚠️ Mô hình '${modelName}' không thể hoàn thành: ${err.message}`);
           break;
@@ -264,8 +263,8 @@ async function main() {
     let attempts = 0;
     while (fileState.state === "PROCESSING") {
       attempts++;
-      console.log(`[Poll] (#${attempts}) File đang được xử lý, đợi 10s...`);
-      await new Promise((resolve) => setTimeout(resolve, 10000));
+      console.log(`[Poll] (#${attempts}) File đang được xử lý, đợi 2s...`);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       fileState = await ai.files.get({ name: uploadResult.name });
     }
 
@@ -293,7 +292,7 @@ async function main() {
   const systemInstruction = fs.readFileSync(promptPath, "utf8");
 
     console.log("[AI] Đang gửi yêu cầu phân tích video sang Gemini AI...");
-    const candidateModels = ["gemini-3.5-flash", "gemini-3.0-flash", "gemini-2.5-flash"];
+    const candidateModels = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-3.0-flash", "gemini-3.5-flash"];
     const response = await generateContentWithRetryFallback(
       ai,
       candidateModels,
