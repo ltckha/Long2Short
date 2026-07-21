@@ -7,7 +7,7 @@ if [ -z "$GEMINI_API_KEY" ]; then
 fi
 
 echo "=================================================="
-echo "       AI VIDEO FACTORY - TIMELINE GENERATOR"
+echo "       AUTO-VIDEO-FACTORY - TIMELINE GENERATOR"
 echo "=================================================="
 echo ""
 

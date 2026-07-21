@@ -2,7 +2,7 @@
 cd "$(dirname "$0")"
 
 echo "========================="
-echo " AI VIDEO FACTORY"
+echo "   AUTO-VIDEO-FACTORY"
 echo "========================="
 echo ""
 

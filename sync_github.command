@@ -2,7 +2,7 @@
 cd "$(dirname "$0")"
 
 echo "================================="
-echo "   LONG2SHORT — SYNC TO GITHUB"
+echo "   AUTO-VIDEO-FACTORY — GITHUB"
 echo "================================="
 echo ""
 

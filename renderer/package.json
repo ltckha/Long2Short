@@ -1,5 +1,5 @@
 {
-  "name": "tiktok-video-render",
+  "name": "auto-video-factory-render",
   "version": "1.0.0",
   "private": true,
   "description": "Render TikTok/Reels video scenes from a JSON timeline with ffmpeg.",
