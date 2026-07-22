@@ -1656,7 +1656,7 @@ async function renderCurrentProject() {
     await syncProjectToSheet({
       projectId: videoId,
       status: "🎬 Rendered",
-      inputFile: inputVideo || "",
+      inputFile: "",
       title: videoMeta.title || "",
       captionHashtags: captionText,
       originalDuration: origDurationFormatted,
@@ -1753,7 +1753,7 @@ async function handleProjectFailure(error) {
     await syncProjectToSheet({
       projectId: videoId,
       status: "❌ Failed",
-      inputFile: inputVideo || "",
+      inputFile: "",
       originalDuration: origDurationFormatted,
       renderedAt: getLocalDateTime(),
     });
