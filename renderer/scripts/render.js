@@ -1638,12 +1638,16 @@ async function renderCurrentProject() {
   writeEffectAnalyticsReport(createEffectAnalytics(advancedEffectsUsed));
   log(`Render completed: project=${videoId} output=${outputPath}`);
 
-  // Đồng bộ Google Sheet khi render thành công
+  cleanupTempDir();
+  archiveSuccessfulRender(workflow, log);
+
+  // Đồng bộ Google Sheet khi render thành công (dùng đường dẫn đã được lưu trữ trong Archive)
   try {
     const videoMeta = timeline.video_meta || {};
     const captionText = `${videoMeta.description || ""} ${(videoMeta.hashtags || []).map((h) => `#${h}`).join(" ")}`.trim();
     const effectsUsed = [...new Set(scenes.map((s) => s.advanced_effect?.name).filter(Boolean))].join(", ");
     const shortDur = scenes.reduce((acc, s) => acc + (Number(s.duration) || 0), 0);
+    const archivedOutputFile = path.join(workflow.archiveDir, videoId, `${videoId}_final.mp4`);
 
     await syncProjectToSheet({
       projectId: videoId,
@@ -1656,19 +1660,16 @@ async function renderCurrentProject() {
       sceneCount: scenes.length,
       hookScore: scenes[0]?.hook_strength || "",
       effectsSummary: effectsUsed,
-      outputFile: outputPath,
+      outputFile: archivedOutputFile,
       createdAt: "",
       renderedAt: getLocalDateTime(),
     });
 
     await syncAnalyticsToSheet();
-    log("[GoogleSheet] Đã đồng bộ trạng thái 🎬 Rendered và Analytics sang Google Sheet & CSV Backup.");
+    log(`[GoogleSheet] Đã đồng bộ trạng thái 🎬 Rendered và Output File (${archivedOutputFile}) sang Google Sheet & CSV Backup.`);
   } catch (sheetErr) {
     log(`WARN: Lỗi đồng bộ Google Sheet: ${sheetErr.message}`);
   }
-
-  cleanupTempDir();
-  archiveSuccessfulRender(workflow, log);
 }
 
 function logSemanticMotionPlan(scene, effect, motionPlan) {
