@@ -70,8 +70,25 @@ const EFFECT_ANALYTICS_DIR = path.join(LOG_DIR, "effect_analytics");
 const FONT_CACHE_DIR = path.join(TEMP_DIR, "fontconfig");
 const INCOMING_DIR = path.join(WORKSPACE_ROOT, "incoming");
 const RENDERED_DIR = path.join(WORKSPACE_ROOT, "rendered");
-const ARCHIVE_DIR = path.join(WORKSPACE_ROOT, "archive");
 const FAILED_DIR = path.join(WORKSPACE_ROOT, "failed");
+
+const NAS_MOUNT_DIR = "/Volumes/Media/Auto-Video-Factory";
+const NAS_ARCHIVE_DIR = path.join(NAS_MOUNT_DIR, "archive");
+const LOCAL_ARCHIVE_DIR = path.join(WORKSPACE_ROOT, "archive");
+
+function resolveArchiveDir() {
+  if (fs.existsSync("/Volumes/Media")) {
+    try {
+      fs.mkdirSync(NAS_ARCHIVE_DIR, { recursive: true });
+      return NAS_ARCHIVE_DIR;
+    } catch (e) {
+      console.warn(`[Archive] WARN: Không thể truy cập ổ NAS (${e.message}). Dùng archive local.`);
+    }
+  }
+  return LOCAL_ARCHIVE_DIR;
+}
+
+const ARCHIVE_DIR = resolveArchiveDir();
 
 const TARGET = {
   width: 1080,
