@@ -1,8 +1,8 @@
 Effect Key,Success Count,Fail Count,Success Rate (%),Safe Pool Status
 "speedup","32","0","100.0%","Safe"
-"zoomsoft","42","0","100.0%","Safe"
-"shake","48","0","100.0%","Safe"
-"zoomin","31","0","100.0%","Safe"
+"zoomsoft","43","0","100.0%","Safe"
+"shake","49","0","100.0%","Safe"
+"zoomin","32","0","100.0%","Safe"
 "overshootzoom","13","0","100.0%","Safe"
 "flash","28","0","100.0%","Safe"
 "speedrampfast","6","0","100.0%","Safe"

@@ -1,15 +1,15 @@
 {
   "_meta": {
     "bootstrapped": true,
-    "last_log_scanned": "/Users/khan/Developer/Auto-Video-Factory/renderer/logs/--mode=short2short_render.log",
+    "last_log_scanned": "/Users/khan/Developer/Auto-Video-Factory/renderer/logs/VID_20260622_124139_render.log",
     "rr_index": 1
   },
   "speedup": {
-    "success": 32,
+    "success": 33,
     "fail": 0
   },
   "zoomsoft": {
-    "success": 43,
+    "success": 44,
     "fail": 0
   },
   "shake": {
@@ -21,11 +21,11 @@
     "fail": 0
   },
   "overshootzoom": {
-    "success": 13,
+    "success": 14,
     "fail": 0
   },
   "flash": {
-    "success": 28,
+    "success": 29,
     "fail": 0
   },
   "speedrampfast": {
