@@ -213,10 +213,10 @@ function validateAndFixTimelineTimestamps(timelineJson, videoPath) {
 }
 
 async function main() {
-  const videoPathArg = process.argv[2];
+  const nonFlagArgs = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
+  const videoPathArg = nonFlagArgs[0];
   if (!videoPathArg) {
     console.error("Lỗi: Vui lòng truyền đường dẫn video gốc.");
-    console.log("Cú pháp: node generateTimeline.js <path_to_video> [project_id]");
     process.exit(1);
   }
 
@@ -233,7 +233,7 @@ async function main() {
   }
 
   const defaultProjectId = path.basename(absoluteVideoPath, path.extname(absoluteVideoPath));
-  const projectId = process.argv[3] || defaultProjectId;
+  const projectId = nonFlagArgs[1] || defaultProjectId;
   console.log(`[Project] Khởi tạo dự án: ${projectId}`);
 
   const ai = new GoogleGenAI({ apiKey });
