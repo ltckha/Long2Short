@@ -349,9 +349,20 @@ async function main() {
     // Đảm bảo thư mục incoming tồn tại
     fs.mkdirSync(INCOMING_DIR, { recursive: true });
 
-    // Gán thuộc tính pipeline_mode vào video_meta
+    // Đo thời lượng video gốc
+    let origDurSec = null;
+    try {
+      const cmd = `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${absoluteVideoPath}"`;
+      const out = require("child_process").execSync(cmd, { encoding: "utf8" }).trim();
+      origDurSec = parseFloat(out);
+    } catch {}
+
+    // Gán thuộc tính pipeline_mode và original_duration_s vào video_meta
     timelineJson.video_meta = timelineJson.video_meta || {};
     timelineJson.video_meta.pipeline_mode = pipelineMode;
+    if (origDurSec && Number.isFinite(origDurSec)) {
+      timelineJson.video_meta.original_duration_s = Number(origDurSec.toFixed(1));
+    }
 
     // Ghi file JSON timeline
     const timelineOutputPath = path.join(INCOMING_DIR, `${projectId}.json`);

@@ -1599,6 +1599,9 @@ async function renderCurrentProject() {
 
   const timeline = normalizeTimeline(loadTimeline(timelinePath));
   const inputVideo = resolveInputVideo(timeline);
+  const origDurSec = getInputVideoDuration(inputVideo) || timeline.video_meta?.original_duration_s;
+  const origDurationFormatted = origDurSec ? `${Number(origDurSec).toFixed(1)}s` : "";
+
   const scenes = buildRenderScenes(normalizeScenes(timeline, inputVideo));
   const outputPath = resolveOutputPath(timeline);
   workflow.timeline = timeline;
@@ -1649,9 +1652,6 @@ async function renderCurrentProject() {
     const effectsUsed = [...new Set(scenes.map((s) => s.advanced_effect?.name).filter(Boolean))].join(", ");
     const shortDur = scenes.reduce((acc, s) => acc + (Number(s.duration) || 0), 0);
     const archivedOutputFile = path.join(workflow.archiveDir, videoId, `${videoId}_final.mp4`);
-
-    const origDurSec = getInputVideoDuration(inputVideo) || videoMeta.original_duration_s;
-    const origDurationFormatted = origDurSec ? `${Number(origDurSec).toFixed(1)}s` : "";
 
     await syncProjectToSheet({
       projectId: videoId,
