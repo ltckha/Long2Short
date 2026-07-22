@@ -94,7 +94,16 @@ function moveFile(sourcePath, targetDir, log) {
     fs.rmSync(destinationPath, { force: true });
   }
 
-  fs.renameSync(sourcePath, destinationPath);
+  try {
+    fs.renameSync(sourcePath, destinationPath);
+  } catch (err) {
+    if (err.code === "EXDEV") {
+      fs.copyFileSync(sourcePath, destinationPath);
+      fs.unlinkSync(sourcePath);
+    } else {
+      throw err;
+    }
+  }
   log(`Move file: ${sourcePath} -> ${destinationPath}`);
   return destinationPath;
 }

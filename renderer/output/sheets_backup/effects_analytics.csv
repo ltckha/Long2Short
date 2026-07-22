@@ -1,6 +1,6 @@
 Effect Key,Success Count,Fail Count,Success Rate (%),Safe Pool Status
-"speedup","31","0","100.0%","Safe"
-"zoomsoft","41","0","100.0%","Safe"
+"speedup","32","0","100.0%","Safe"
+"zoomsoft","42","0","100.0%","Safe"
 "shake","48","0","100.0%","Safe"
 "zoomin","31","0","100.0%","Safe"
 "overshootzoom","13","0","100.0%","Safe"
@@ -9,3 +9,4 @@ Effect Key,Success Count,Fail Count,Success Rate (%),Safe Pool Status
 "driftcam","1","0","100.0%","Restricted"
 "speedramp","5","0","100.0%","Safe"
 "zoom","1","0","100.0%","Restricted"
+"rgbshift","1","0","100.0%","Restricted"
