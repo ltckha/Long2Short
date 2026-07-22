@@ -1745,21 +1745,16 @@ async function main() {
   }
 }
 
-function handleProjectFailure(error) {
+async function handleProjectFailure(error) {
   try {
-    syncProjectToSheet({
+    const origDurSec = getInputVideoDuration(inputVideo);
+    const origDurationFormatted = origDurSec ? `${Number(origDurSec).toFixed(1)}s` : "";
+
+    await syncProjectToSheet({
       projectId: videoId,
       status: "❌ Failed",
-      inputFile: "",
-      title: "",
-      captionHashtags: "",
-      originalDuration: "",
-      shortDuration: "",
-      sceneCount: "",
-      hookScore: "",
-      effectsSummary: "",
-      outputFile: "",
-      createdAt: "",
+      inputFile: inputVideo || "",
+      originalDuration: origDurationFormatted,
       renderedAt: getLocalDateTime(),
     });
   } catch {}

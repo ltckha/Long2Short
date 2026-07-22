@@ -129,21 +129,31 @@ async function syncScenesToSheet(projectId, scenes) {
   ];
 
   for (const s of scenes) {
-    const textEffectName = typeof s.text_effect === "object" ? s.text_effect.name : s.text_effect;
-    const advEffectName = typeof s.advanced_effect === "object" ? s.advanced_effect.name : s.advanced_effect;
+    const textEffectName = typeof s.text_effect === "object" ? s.text_effect?.name : s.text_effect;
+    const advEffectName = typeof s.advanced_effect === "object" ? s.advanced_effect?.name : s.advanced_effect;
     const transOutType = s.transition_out ? `${s.transition_out.type} (${s.transition_out.duration}s)` : "none";
+
+    const startVal = s.start_s !== undefined ? s.start_s : s.start;
+    const endVal = s.end_s !== undefined ? s.end_s : s.end;
+    const durVal = s.duration_s !== undefined ? s.duration_s : s.duration;
+
+    const subtitleText = s.text_content || s.subtitle || s.text || "";
+    const voiceText = s.voice || s.voiceover || "";
+    const visualText = s.visual_description || s.visual_cue || s.description || "";
+    const styleText = `${s.subtitle_style || "default"} (${s.text_position || "bottom"})`;
+    const effectText = `${advEffectName || "none"} (${s.advanced_effect?.camera_motion || "static"})`;
 
     const row = [
       projectId,
-      s.scene_id,
-      s.scene_type,
-      `${s.start_s || 0}s - ${s.end_s || 0}s`,
-      `${s.duration_s || 0}s`,
-      s.subtitle,
-      s.voice,
-      s.visual_cue,
-      `${s.subtitle_style || "default"} (${s.text_position || "bottom"})`,
-      `${advEffectName || "none"} (${s.advanced_effect?.camera_motion || "static"})`,
+      s.scene_id || s.id || "",
+      s.scene_type || "body",
+      `${startVal || 0}s - ${endVal || 0}s`,
+      `${durVal || 0}s`,
+      subtitleText,
+      voiceText,
+      visualText,
+      styleText,
+      effectText,
       transOutType
     ];
     appendCsvLine(csvPath, headers, row);
