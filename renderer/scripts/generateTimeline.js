@@ -347,7 +347,13 @@ async function main() {
       const shortDur = scenes.reduce((acc, s) => acc + (Number(s.duration_s) || 0), 0);
       const effectsUsed = [...new Set(scenes.map((s) => s.advanced_effect?.name).filter(Boolean))].join(", ");
 
-      const captionText = `${videoMeta.description || ""} ${(videoMeta.hashtags || []).map((h) => `#${h}`).join(" ")}`.trim();
+      let origDurSec = null;
+      try {
+        const cmd = `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${absoluteVideoPath}"`;
+        const out = require("child_process").execSync(cmd, { encoding: "utf8" }).trim();
+        origDurSec = parseFloat(out);
+      } catch {}
+      const origDurationFormatted = origDurSec && Number.isFinite(origDurSec) ? `${origDurSec.toFixed(1)}s` : "";
 
       await syncProjectToSheet({
         projectId,
@@ -356,7 +362,7 @@ async function main() {
         inputFile: absoluteVideoPath,
         title: videoMeta.title || "",
         captionHashtags: captionText,
-        originalDuration: "",
+        originalDuration: origDurationFormatted,
         shortDuration: `${shortDur.toFixed(1)}s`,
         sceneCount: scenes.length,
         hookScore: scenes[0]?.hook_strength || "",

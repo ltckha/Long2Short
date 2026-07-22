@@ -1649,13 +1649,16 @@ async function renderCurrentProject() {
     const shortDur = scenes.reduce((acc, s) => acc + (Number(s.duration) || 0), 0);
     const archivedOutputFile = path.join(workflow.archiveDir, videoId, `${videoId}_final.mp4`);
 
+    const origDurSec = getInputVideoDuration(inputVideo) || videoMeta.original_duration_s;
+    const origDurationFormatted = origDurSec ? `${Number(origDurSec).toFixed(1)}s` : "";
+
     await syncProjectToSheet({
       projectId: videoId,
       status: "🎬 Rendered",
       inputFile: "",
       title: videoMeta.title || "",
       captionHashtags: captionText,
-      originalDuration: "",
+      originalDuration: origDurationFormatted,
       shortDuration: `${shortDur.toFixed(1)}s`,
       sceneCount: scenes.length,
       hookScore: scenes[0]?.hook_strength || "",
