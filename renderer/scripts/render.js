@@ -1653,10 +1653,22 @@ async function renderCurrentProject() {
     const shortDur = scenes.reduce((acc, s) => acc + (Number(s.duration) || 0), 0);
     const archivedOutputFile = path.join(workflow.archiveDir, videoId, `${videoId}_final.mp4`);
 
+    const createdAtFormatted = videoMeta.created_at || (function() {
+      try {
+        if (fs.existsSync(timelinePath)) {
+          const stat = fs.statSync(timelinePath);
+          return getLocalDateTime(stat.birthtime || stat.mtime);
+        }
+      } catch {}
+      return "";
+    })();
+
+    const origInputFile = videoMeta.input_file || inputVideo || "";
+
     await syncProjectToSheet({
       projectId: videoId,
       status: "🎬 Rendered",
-      inputFile: "",
+      inputFile: origInputFile,
       title: videoMeta.title || "",
       captionHashtags: captionText,
       originalDuration: origDurationFormatted,
@@ -1665,7 +1677,7 @@ async function renderCurrentProject() {
       hookScore: scenes[0]?.hook_strength || "",
       effectsSummary: effectsUsed,
       outputFile: archivedOutputFile,
-      createdAt: "",
+      createdAt: createdAtFormatted,
       renderedAt: getLocalDateTime(),
     });
 
@@ -1750,11 +1762,24 @@ async function handleProjectFailure(error) {
     const origDurSec = getInputVideoDuration(inputVideo);
     const origDurationFormatted = origDurSec ? `${Number(origDurSec).toFixed(1)}s` : "";
 
+    const createdAtFormatted = (workflow.timeline && workflow.timeline.video_meta && workflow.timeline.video_meta.created_at) || (function() {
+      try {
+        if (fs.existsSync(timelinePath)) {
+          const stat = fs.statSync(timelinePath);
+          return getLocalDateTime(stat.birthtime || stat.mtime);
+        }
+      } catch {}
+      return "";
+    })();
+
+    const origInputFile = (workflow.timeline && workflow.timeline.video_meta && workflow.timeline.video_meta.input_file) || inputVideo || "";
+
     await syncProjectToSheet({
       projectId: videoId,
       status: "❌ Failed",
-      inputFile: "",
+      inputFile: origInputFile,
       originalDuration: origDurationFormatted,
+      createdAt: createdAtFormatted,
       renderedAt: getLocalDateTime(),
     });
   } catch {}

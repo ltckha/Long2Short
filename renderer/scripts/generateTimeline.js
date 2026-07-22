@@ -357,9 +357,12 @@ async function main() {
       origDurSec = parseFloat(out);
     } catch {}
 
-    // Gán thuộc tính pipeline_mode và original_duration_s vào video_meta
+    // Gán thuộc tính pipeline_mode, original_duration_s, created_at và input_file vào video_meta
+    const nowCreatedAt = getLocalDateTime();
     timelineJson.video_meta = timelineJson.video_meta || {};
     timelineJson.video_meta.pipeline_mode = pipelineMode;
+    timelineJson.video_meta.created_at = nowCreatedAt;
+    timelineJson.video_meta.input_file = absoluteVideoPath;
     if (origDurSec && Number.isFinite(origDurSec)) {
       timelineJson.video_meta.original_duration_s = Number(origDurSec.toFixed(1));
     }
@@ -402,7 +405,7 @@ async function main() {
         hookScore: scenes[0]?.hook_strength || "",
         effectsSummary: effectsUsed,
         outputFile: "",
-        createdAt: getLocalDateTime(),
+        createdAt: nowCreatedAt,
         renderedAt: "",
       });
 
