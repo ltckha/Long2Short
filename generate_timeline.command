@@ -24,21 +24,6 @@ if [ -z "$GEMINI_API_KEY" ]; then
     export GEMINI_API_KEY="$INPUT_KEY"
 fi
 
-echo "🎯 Chọn Chế độ Xử lý Video (Pipeline Mode):"
-echo "   [1] Long2Short  : Cắt lọc phân cảnh đắt giá từ Video Dài (> 90s)"
-echo "   [2] Short2Short : Tái cấu trúc, đổi voice & hiệu ứng cho Video Ngắn (15s-90s)"
-echo ""
-read -p "Nhập lựa chọn của bạn [Mặc định 1]: " MODE_CHOICE
-
-MODE_FLAG="--mode=long2short"
-if [ "$MODE_CHOICE" = "2" ]; then
-    MODE_FLAG="--mode=short2short"
-    echo "👉 Đã chọn Chế độ: SHORT2SHORT"
-else
-    echo "👉 Đã chọn Chế độ: LONG2SHORT"
-fi
-
-echo ""
 echo "👉 Kéo thả file video (.mp4) bạn muốn phân tích vào cửa sổ này,"
 echo "   sau đó nhấn [ENTER] để bắt đầu:"
 echo ""
@@ -56,15 +41,57 @@ if [ -z "$VIDEO_PATH" ] || [ ! -f "$VIDEO_PATH" ]; then
 fi
 
 echo ""
+echo "🔍 Đang đo độ dài video nguồn..."
+RAW_DUR=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$VIDEO_PATH" 2>/dev/null)
+
+MODE_FLAG="--mode=short2short"
+
+if [ -n "$RAW_DUR" ]; then
+    DUR_FLOAT=$(printf "%.1f" "$RAW_DUR")
+    DUR_INT=${DUR_FLOAT%.*}
+
+    if [ "$DUR_INT" -lt 55 ]; then
+        MODE_FLAG="--mode=short2short"
+        echo "⏱️ Độ dài video: ${DUR_FLOAT}s (< 55s) ➔ Tự động chọn Chế độ [Short2Short]"
+    elif [ "$DUR_INT" -gt 90 ]; then
+        MODE_FLAG="--mode=long2short"
+        echo "⏱️ Độ dài video: ${DUR_FLOAT}s (> 90s) ➔ Tự động chọn Chế độ [Long2Short]"
+    else
+        echo "⏱️ Độ dài video: ${DUR_FLOAT}s (nằm trong khoảng 55s - 90s)."
+        echo "🎯 Vui lòng chọn Chế độ Xử lý Video:"
+        echo "   [1] Long2Short  : Cắt lọc phân cảnh đắt giá từ Video Dài (> 90s)"
+        echo "   [2] Short2Short : Tái cấu trúc, đổi voice & hiệu ứng cho Video Ngắn (15s-90s)"
+        echo ""
+        read -p "Nhập lựa chọn của bạn [Mặc định 2]: " MODE_CHOICE
+        if [ "$MODE_CHOICE" = "1" ]; then
+            MODE_FLAG="--mode=long2short"
+            echo "👉 Đã chọn Chế độ: LONG2SHORT"
+        else
+            MODE_FLAG="--mode=short2short"
+            echo "👉 Đã chọn Chế độ: SHORT2SHORT"
+        fi
+    fi
+else
+    echo "⚠️ Không thể tự động đo thời lượng video. Chọn thủ công:"
+    echo "   [1] Long2Short  : Cắt lọc phân cảnh đắt giá từ Video Dài"
+    echo "   [2] Short2Short : Tái cấu trúc cho Video Ngắn"
+    read -p "Nhập lựa chọn của bạn [Mặc định 2]: " MODE_CHOICE
+    if [ "$MODE_CHOICE" = "1" ]; then
+        MODE_FLAG="--mode=long2short"
+    else
+        MODE_FLAG="--mode=short2short"
+    fi
+fi
+
+echo ""
 echo "🚀 Đang khởi chạy Gemini AI phân tích video ($MODE_FLAG)..."
 echo "--------------------------------------------------"
-node renderer/scripts/generateTimeline.js "$VIDEO_PATH" "" "$MODE_FLAG"
-echo "--------------------------------------------------"
+
+node renderer/scripts/generateTimeline.js "$VIDEO_PATH" "$MODE_FLAG"
 
 echo ""
 echo "=================================================="
 echo "                  HOÀN TẤT"
 echo "=================================================="
 echo ""
-
 read -n 1 -s -r -p "Nhấn phím bất kỳ để đóng..."

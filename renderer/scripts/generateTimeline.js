@@ -268,11 +268,34 @@ async function main() {
     console.log("[Poll] Video đã sẵn sàng hoạt động!");
 
   // Phân tích tham số mode: node generateTimeline.js <path_to_video> [project_id] [--mode=short2short|long2short]
-  let mode = "long2short";
+  let mode = null;
   const modeArg = process.argv.find((arg) => arg.startsWith("--mode="));
   if (modeArg) {
     mode = modeArg.split("=")[1].toLowerCase().trim();
   }
+
+  // Tự động nhận diện Mode dựa trên độ dài video nếu không truyền cờ --mode
+  if (!mode) {
+    let dur = null;
+    try {
+      const cmd = `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${videoPathArg}"`;
+      const out = require("child_process").execSync(cmd, { encoding: "utf8" }).trim();
+      dur = parseFloat(out);
+    } catch {}
+
+    if (dur && Number.isFinite(dur)) {
+      if (dur < 55) {
+        mode = "short2short";
+      } else if (dur > 90) {
+        mode = "long2short";
+      } else {
+        mode = "short2short";
+      }
+    } else {
+      mode = "long2short";
+    }
+  }
+
   const isShort2Short = mode === "short2short";
   const pipelineMode = isShort2Short ? "Short2Short" : "Long2Short";
   const promptFileName = isShort2Short ? "short2short_generator_prompt.md" : "long2short_generator_prompt.md";
