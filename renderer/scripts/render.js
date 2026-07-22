@@ -57,6 +57,7 @@ const {
   getLocalDateTime,
   syncAnalyticsToSheet,
   syncProjectToSheet,
+  syncScenesToSheet,
 } = require("./googleSheetsSync");
 
 const ROOT = path.resolve(__dirname, "..");
@@ -1668,8 +1669,9 @@ async function renderCurrentProject() {
       renderedAt: getLocalDateTime(),
     });
 
+    await syncScenesToSheet(videoId, scenes);
     await syncAnalyticsToSheet();
-    log(`[GoogleSheet] Đã đồng bộ trạng thái 🎬 Rendered và Output File (${archivedOutputFile}) sang Google Sheet & CSV Backup.`);
+    log(`[GoogleSheet] Đã đồng bộ trạng thái 🎬 Rendered, SCENES_DETAIL và Output File (${archivedOutputFile}) sang Google Sheet & CSV Backup.`);
   } catch (sheetErr) {
     log(`WARN: Lỗi đồng bộ Google Sheet: ${sheetErr.message}`);
   }
