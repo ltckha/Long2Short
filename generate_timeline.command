@@ -88,6 +88,29 @@ echo "🚀 Đang khởi chạy Gemini AI phân tích video ($MODE_FLAG)..."
 echo "--------------------------------------------------"
 
 node renderer/scripts/generateTimeline.js "$VIDEO_PATH" "$MODE_FLAG"
+GEN_STATUS=$?
+
+if [ $GEN_STATUS -eq 0 ]; then
+    PROJECT_ID=$(basename "$VIDEO_PATH" | sed 's/\.[^.]*$//')
+    echo ""
+    echo "=================================================="
+    echo "⚡ BẠN CÓ MUỐN TIẾN HÀNH RENDER DỰ ÁN NGAY KHÔNG?"
+    echo "   [1] Có   - Tiến hành Render & Gửi ra NAS ngay (Mặc định)"
+    echo "   [2] Không - Thoát và để render sau"
+    echo "=================================================="
+    echo ""
+    read -p "Nhập lựa chọn của bạn [Mặc định 1]: " RENDER_CHOICE
+
+    if [ "$RENDER_CHOICE" != "2" ]; then
+        echo ""
+        echo "🚀 Đang tiến hành Render dự án '$PROJECT_ID'..."
+        echo "--------------------------------------------------"
+        node renderer/scripts/render.js "$PROJECT_ID"
+    else
+        echo ""
+        echo "💡 Đã lưu kịch bản. Bạn có thể mở render.command để dựng video bất cứ lúc nào."
+    fi
+fi
 
 echo ""
 echo "=================================================="
