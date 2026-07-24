@@ -1,27 +1,27 @@
 {
   "_meta": {
     "bootstrapped": true,
-    "last_log_scanned": "/Users/khan/Developer/Auto-Video-Factory/renderer/logs/VID_20260622_172006_render.log",
+    "last_log_scanned": "/Users/khan/Developer/Auto-Video-Factory/renderer/logs/VID_20260616_113203_render.log",
     "rr_index": 1
   },
   "speedup": {
-    "success": 35,
+    "success": 37,
     "fail": 0
   },
   "zoomsoft": {
-    "success": 47,
+    "success": 51,
     "fail": 0
   },
   "shake": {
-    "success": 50,
+    "success": 52,
     "fail": 0
   },
   "zoomin": {
-    "success": 33,
+    "success": 35,
     "fail": 0
   },
   "overshootzoom": {
-    "success": 15,
+    "success": 18,
     "fail": 0
   },
   "flash": {
@@ -45,7 +45,7 @@
     "fail": 0
   },
   "rgbshift": {
-    "success": 3,
+    "success": 6,
     "fail": 0
   }
 }

@@ -1,0 +1,115 @@
+{
+  "style_profile": {
+    "name": "ASMR Architectural Satisfying Build",
+    "average_scene_duration_s": 1.2,
+    "pacing_speed": "dynamic",
+    "hook_strategy": "Khởi đầu ngay lập tức bằng hành động xếp vòng tròn chai nhựa quy mô lớn trên bãi cát kèm âm thanh ASMR giòn giã để kích thích sự tò mò về công trình sắp dựng.",
+    "preferred_font_layout": "Không sử dụng chữ viết hoặc phụ đề (Silent ASMR Style), tập trung 100% vào hình ảnh chất lượng cao và âm thanh thực tế cực kỳ chân thực.",
+    "transition_rules": [
+      "Sử dụng kỹ thuật cắt cảnh Jump Cut cực nhanh đồng bộ trực tiếp với các nhịp âm thanh vật lý mạnh mẽ như tiếng búa gõ, tiếng khoan, tiếng cắt.",
+      "Tua nhanh (Speed Ramp) các chuyển động cơ thể của người xây dựng để tăng cảm giác thần tốc, gọn gàng."
+    ]
+  },
+  "learned_novel_effects": [
+    {
+      "effect_name": "ASMR Snap-to-Grid Build",
+      "visual_intent": "satisfying_reveal",
+      "camera_motion": "static",
+      "recommended_intensity": 0.9,
+      "description": "Các chi tiết xây dựng như khung gỗ, lớp phủ, tấm lót sàn xuất hiện liên tục và biến đổi siêu tốc trong một góc máy cố định như thể tự động lắp ráp."
+    },
+    {
+      "effect_name": "Seamless Portal Interior Glide",
+      "visual_intent": "luxury_reveal",
+      "camera_motion": "zoom_in_out",
+      "recommended_intensity": 0.8,
+      "description": "Cú camera di chuyển mượt mà đi từ cửa chính của ngôi nhà vòm thô sơ bước thẳng vào một không gian nội thất sang trọng, ấm cúng hoàn toàn tương phản."
+    }
+  ],
+  "few_shot_examples": [
+    {
+      "scene_type": "hook",
+      "duration_range": "0.0s - 3.0s",
+      "visual_description": "Cảnh quay từ trên cao và góc trung cảnh người đàn ông xếp hàng loạt chai Coca-Cola lớn thành vòng tròn khép kín trên cát, buộc dây thừng chắc chắn.",
+      "voice_rhythm": "Không lời thoại, nổi bật tiếng sóng biển rì rào cùng âm thanh va chạm giòn giã của chai nhựa.",
+      "suggested_text_effect": "none",
+      "suggested_subtitle_style": "none",
+      "suggested_advanced_effect": {
+        "name": "ASMR Snap-to-Grid Build",
+        "intent": "satisfying_reveal",
+        "mood": "satisfying",
+        "pacing": "fast",
+        "focus": "action",
+        "camera_motion": "static",
+        "intensity": 0.9
+      },
+      "suggested_transition_out": {
+        "type": "fade",
+        "duration": 0.2
+      }
+    },
+    {
+      "scene_type": "body",
+      "duration_range": "3.0s - 24.0s",
+      "visual_description": "Các công đoạn thi công thô nhanh chóng: phủ bạt, cắt xốp cách nhiệt, lắp khung gỗ vòm geodesic, trát xi măng, sơn xanh lục và lắp pin mặt trời.",
+      "voice_rhythm": "Không lời thoại, nhịp cắt dồn dập theo tiếng máy khoan, tiếng búa và tiếng trát vữa sột soạt cực đã tai.",
+      "suggested_text_effect": "none",
+      "suggested_subtitle_style": "none",
+      "suggested_advanced_effect": {
+        "name": "Speed Ramp Construction Reveal",
+        "intent": "high_energy_hook",
+        "mood": "energetic",
+        "pacing": "dynamic",
+        "focus": "product",
+        "camera_motion": "drift_left",
+        "intensity": 0.8
+      },
+      "suggested_transition_out": {
+        "type": "wipe_left",
+        "duration": 0.2
+      }
+    },
+    {
+      "scene_type": "highlight",
+      "duration_range": "24.0s - 51.0s",
+      "visual_description": "Phần thi công nội thất tinh xảo: bắn ghim cách nhiệt, ốp gỗ tường hình tam giác, lắp bảng điện phức tạp, trải thảm, đặt giường ngủ, kệ tủ tivi sang trọng.",
+      "voice_rhythm": "Không lời thoại, nhịp độ âm thanh chuyển sang tiếng gõ búa cao su đều đặn, tiếng kéo khóa đệm và khoan gỗ mượt mà.",
+      "suggested_text_effect": "none",
+      "suggested_subtitle_style": "none",
+      "suggested_advanced_effect": {
+        "name": "ASMR Snap-to-Grid Build",
+        "intent": "satisfying_reveal",
+        "mood": "satisfying",
+        "pacing": "fast",
+        "focus": "detail",
+        "camera_motion": "static",
+        "intensity": 0.9
+      },
+      "suggested_transition_out": {
+        "type": "fade",
+        "duration": 0.3
+      }
+    },
+    {
+      "scene_type": "outro",
+      "duration_range": "51.0s - 60.0s",
+      "visual_description": "Camera trượt từ từ qua cánh cửa gỗ mở toang, tiến sâu vào không gian phòng ngủ sang trọng của căn nhà vòm đã hoàn thiện lung linh dưới ánh đèn LED vàng ấm áp.",
+      "voice_rhythm": "Không lời thoại, chỉ có tiếng sóng biển vỗ nhẹ bên ngoài kết hợp âm thanh tĩnh lặng, sang trọng của nội thất cao cấp.",
+      "suggested_text_effect": "none",
+      "suggested_subtitle_style": "none",
+      "suggested_advanced_effect": {
+        "name": "Seamless Portal Interior Glide",
+        "intent": "luxury_reveal",
+        "mood": "luxury",
+        "pacing": "slow",
+        "focus": "product",
+        "camera_motion": "zoom_in_out",
+        "intensity": 0.8
+      },
+      "suggested_transition_out": {
+        "type": "fade",
+        "duration": 0.5
+      }
+    }
+  ]
+}
